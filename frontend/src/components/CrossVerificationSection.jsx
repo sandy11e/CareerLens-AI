@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, CheckCircle2, AlertCircle, PlusCircle } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, AlertCircle, PlusCircle, Code, GitCommit, Sparkles, Check, ArrowRight } from 'lucide-react';
 import ScoreGauge from './ScoreGauge';
 
 export default function CrossVerificationSection({ data }) {
@@ -9,6 +9,10 @@ export default function CrossVerificationSection({ data }) {
   const verifiedSkills = crossVer.verified_skills || [];
   const unverifiedSkills = crossVer.unverified_skills || [];
   const omittedStrengths = crossVer.omitted_github_strengths || [];
+
+  const totalEvaluated = verifiedSkills.length + unverifiedSkills.length || 1;
+  const verifiedRatio = Math.round((verifiedSkills.length / totalEvaluated) * 100);
+  const unverifiedRatio = 100 - verifiedRatio;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -63,6 +67,21 @@ export default function CrossVerificationSection({ data }) {
             </div>
           </div>
         </div>
+
+        {/* Visual Trust Ratio Bar */}
+        <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--border-subtle)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', color: 'var(--text-muted)', marginBottom: 6, fontWeight: 600 }}>
+            <span>Verification Proof Ratio</span>
+            <span style={{ color: 'var(--emerald)', fontWeight: 700 }}>
+              {verifiedRatio}% Verified by Code Evidence • {unverifiedRatio}% Unverified Claims
+            </span>
+          </div>
+
+          <div className="visual-segmented-bar" style={{ height: 10 }}>
+            <div style={{ width: `${verifiedRatio}%`, background: 'var(--emerald)' }} title={`Verified: ${verifiedRatio}%`} />
+            <div style={{ width: `${unverifiedRatio}%`, background: 'var(--amber)' }} title={`Unverified: ${unverifiedRatio}%`} />
+          </div>
+        </div>
       </div>
 
       {/* Discovery Alert: Skills on GitHub but NOT on Resume */}
@@ -90,9 +109,10 @@ export default function CrossVerificationSection({ data }) {
                     padding: '3px 10px',
                     borderRadius: 16,
                     fontSize: '0.74rem',
-                    fontWeight: 600
+                    fontWeight: 600,
+                    boxShadow: 'var(--shadow-xs)'
                   }}>
-                    + Add {str}
+                    + Add {str} to Resume
                   </span>
                 ))}
               </div>
@@ -107,28 +127,37 @@ export default function CrossVerificationSection({ data }) {
         <div className="card-solid" style={{ padding: '22px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
             <CheckCircle2 size={18} color="var(--emerald)" />
-            <h4 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)' }}>
-              Verified Claims ({verifiedSkills.length})
-            </h4>
+            <div>
+              <h4 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
+                Verified Claims ({verifiedSkills.length})
+              </h4>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                Authenticated against public repositories and code commits
+              </div>
+            </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {verifiedSkills.map((item, idx) => (
               <div key={idx} style={{
-                background: 'var(--emerald-subtle)',
+                background: '#ffffff',
                 border: '1px solid var(--emerald-border)',
-                borderRadius: 8,
-                padding: '10px 14px'
+                borderRadius: 10,
+                padding: '12px 14px',
+                boxShadow: 'var(--shadow-xs)'
               }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
-                  <span style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '0.86rem' }}>
-                    {item.skill}
-                  </span>
-                  <span className="badge badge-emerald" style={{ fontSize: '0.62rem' }}>
-                    {item.proof_type}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--emerald)' }} />
+                    <span style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '0.88rem' }}>
+                      {item.skill}
+                    </span>
+                  </div>
+                  <span className="badge badge-emerald" style={{ fontSize: '0.64rem' }}>
+                    {item.proof_type || 'Verified Code'}
                   </span>
                 </div>
-                <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
+                <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', lineHeight: 1.45, paddingLeft: 14 }}>
                   {item.evidence}
                 </div>
               </div>
@@ -146,32 +175,35 @@ export default function CrossVerificationSection({ data }) {
         <div className="card-solid" style={{ padding: '22px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
             <AlertCircle size={18} color="var(--amber)" />
-            <h4 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)' }}>
-              Unverified Claims ({unverifiedSkills.length})
-            </h4>
+            <div>
+              <h4 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
+                Unverified Claims ({unverifiedSkills.length})
+              </h4>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                Skills listed on resume without matching public code
+              </div>
+            </div>
           </div>
 
-          <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginBottom: 14 }}>
-            These skills appear on your resume but have no corresponding public repositories or code commits.
-          </p>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {unverifiedSkills.map((item, idx) => (
               <div key={idx} style={{
                 background: 'var(--amber-subtle)',
                 border: '1px solid var(--amber-border)',
-                borderRadius: 8,
-                padding: '9px 12px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
+                borderRadius: 10,
+                padding: '12px 14px'
               }}>
-                <span style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '0.84rem' }}>
-                  {item.skill}
-                </span>
-                <span style={{ fontSize: '0.7rem', color: 'var(--amber)', fontWeight: 600 }}>
-                  Needs Code Artifact
-                </span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                  <span style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '0.86rem' }}>
+                    {item.skill}
+                  </span>
+                  <span className="badge badge-amber" style={{ fontSize: '0.62rem' }}>
+                    Unverified
+                  </span>
+                </div>
+                <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                  💡 Authenticate by creating a public GitHub repository or pushing sample tests showcasing {item.skill}.
+                </div>
               </div>
             ))}
 
@@ -186,3 +218,4 @@ export default function CrossVerificationSection({ data }) {
     </div>
   );
 }
+

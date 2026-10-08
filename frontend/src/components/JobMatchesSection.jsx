@@ -57,6 +57,7 @@ export default function JobMatchesSection({ data, onJdMatchUpdate, onRoadmapUpda
   const [jdError, setJdError] = useState('');
   const [showInputDrawer, setShowInputDrawer] = useState(!customJd);
   const [isUpdatingRoadmap, setIsUpdatingRoadmap] = useState(false);
+  const [expandedQuestion, setExpandedQuestion] = useState(null);
   const fileInputRef = useRef(null);
 
   if (!data) return null;
@@ -650,6 +651,28 @@ export default function JobMatchesSection({ data, onJdMatchUpdate, onRoadmapUpda
                         </div>
                       </div>
                     </div>
+
+                    {/* Visual Skills Coverage Proportion Bar */}
+                    {(() => {
+                      const matchedLen = customJd.matched_skills?.length || 0;
+                      const missingLen = customJd.missing_skills?.length || 0;
+                      const tot = matchedLen + missingLen || 1;
+                      const matchedRatio = Math.round((matchedLen / tot) * 100);
+                      return (
+                        <div style={{ marginTop: 14, background: '#ffffff', padding: '10px 14px', borderRadius: 10, border: '1px solid var(--border-subtle)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', color: 'var(--text-muted)', marginBottom: 6, fontWeight: 600 }}>
+                            <span>Skills Coverage Breakdown</span>
+                            <span style={{ color: 'var(--emerald)', fontWeight: 700 }}>
+                              {matchedLen} Matched ({matchedRatio}%) • {missingLen} Gaps ({100 - matchedRatio}%)
+                            </span>
+                          </div>
+                          <div className="visual-segmented-bar" style={{ height: 8 }}>
+                            <div style={{ width: `${matchedRatio}%`, background: 'var(--emerald)' }} title={`Matched: ${matchedRatio}%`} />
+                            <div style={{ width: `${100 - matchedRatio}%`, background: 'var(--amber)' }} title={`Missing Gaps: ${100 - matchedRatio}%`} />
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* Right: Score Gauge & Action */}
@@ -917,51 +940,109 @@ export default function JobMatchesSection({ data, onJdMatchUpdate, onRoadmapUpda
                 )}
               </div>
 
-              {/* Tailored Technical Interview Questions */}
+              {/* Tailored Technical Interview Questions (Interactive Flashcards) */}
               {customJd.interview_questions && customJd.interview_questions.length > 0 && (
                 <div className="card-solid" style={{ padding: '22px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                    <div style={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: 8,
-                      background: 'var(--purple-subtle, #f5f3ff)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'var(--purple, #7c3aed)'
-                    }}>
-                      <HelpCircle size={16} />
-                    </div>
-                    <div>
-                      <h4 className="font-display" style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
-                        High-Probability Technical Interview Questions for this Opening
-                      </h4>
-                      <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                        Anticipate what hiring managers will ask based on this JD's requirements
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 10 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 8,
+                        background: 'var(--purple-subtle, #f5f3ff)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'var(--purple, #7c3aed)'
+                      }}>
+                        <HelpCircle size={18} />
+                      </div>
+                      <div>
+                        <h4 className="font-display" style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
+                          High-Probability Technical Interview Questions
+                        </h4>
+                        <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                          Click any question card to inspect interviewer evaluation checkpoints
+                        </div>
                       </div>
                     </div>
+
+                    <span className="badge badge-purple" style={{ fontSize: '0.68rem' }}>
+                      {customJd.interview_questions.length} Targeted Questions
+                    </span>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
-                    {customJd.interview_questions.map((q, idx) => (
-                      <div key={idx} style={{
-                        background: '#ffffff',
-                        border: '1px solid var(--border-medium)',
-                        borderRadius: 10,
-                        padding: '14px 16px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between'
-                      }}>
-                        <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--purple, #7c3aed)', textTransform: 'uppercase', marginBottom: 6 }}>
-                          Question #{idx + 1}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 14 }}>
+                    {customJd.interview_questions.map((q, idx) => {
+                      const isExpanded = expandedQuestion === idx;
+                      const qTopic = idx % 3 === 0 ? 'System Design & Tradeoffs' : idx % 3 === 1 ? 'Architecture & Concurrency' : 'Data Integrity & Edge Cases';
+                      return (
+                        <div
+                          key={idx}
+                          onClick={() => setExpandedQuestion(isExpanded ? null : idx)}
+                          className="flashcard"
+                          style={{
+                            border: isExpanded ? '1.5px solid var(--purple, #7c3aed)' : '1px solid var(--border-medium)',
+                            background: isExpanded ? 'linear-gradient(180deg, #ffffff 0%, var(--purple-subtle, #faf5ff) 100%)' : '#ffffff',
+                            borderRadius: 12,
+                            padding: '16px 18px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            cursor: 'pointer',
+                            boxShadow: isExpanded ? 'var(--shadow-md)' : 'var(--shadow-xs)',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: 'var(--purple, #7c3aed)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                                Question #{idx + 1}
+                              </span>
+                              <span className="badge badge-purple" style={{ fontSize: '0.62rem' }}>
+                                {qTopic}
+                              </span>
+                            </div>
+
+                            <div style={{ fontSize: '0.86rem', color: 'var(--text-main)', fontWeight: 600, lineHeight: 1.45, marginBottom: 12 }}>
+                              "{q}"
+                            </div>
+                          </div>
+
+                          <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: 10 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span style={{ fontSize: '0.72rem', color: 'var(--purple, #7c3aed)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                                <Sparkles size={12} />
+                                {isExpanded ? 'Hide rubric checkpoints' : 'Inspect what interviewers look for'}
+                              </span>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                {isExpanded ? '▲' : '▼'}
+                              </span>
+                            </div>
+
+                            {isExpanded && (
+                              <div style={{ marginTop: 10, paddingTop: 8, borderTop: '1px dashed var(--border-medium)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                                  Key Candidate Checkpoints:
+                                </div>
+                                <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', lineHeight: 1.4, display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+                                  <span style={{ color: 'var(--emerald)', fontWeight: 700 }}>✓</span>
+                                  <span>State trade-offs between throughput, latency, and memory footprints clearly.</span>
+                                </div>
+                                <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', lineHeight: 1.4, display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+                                  <span style={{ color: 'var(--emerald)', fontWeight: 700 }}>✓</span>
+                                  <span>Highlight real production examples from your verified projects (e.g., caching, DB transactions).</span>
+                                </div>
+                                <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', lineHeight: 1.4, display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+                                  <span style={{ color: 'var(--emerald)', fontWeight: 700 }}>✓</span>
+                                  <span>Discuss how you monitor failure rates, circuit breakers, and logging in production.</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                        <div style={{ fontSize: '0.84rem', color: 'var(--text-main)', fontWeight: 500, lineHeight: 1.45 }}>
-                          "{q}"
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}

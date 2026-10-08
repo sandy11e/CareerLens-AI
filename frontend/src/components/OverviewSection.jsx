@@ -136,6 +136,156 @@ export default function OverviewSection({ data, setActiveTab }) {
         </div>
       </div>
 
+      {/* Visual Career Readiness Stage Stepper Track */}
+      <div className="card-solid" style={{ padding: '20px 24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
+          <div style={{ fontSize: '0.76rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            Comprehensive Candidate Readiness Pipeline
+          </div>
+          <span className="badge badge-emerald" style={{ fontSize: '0.7rem' }}>
+            {data.readiness_category || 'Interview Ready'}
+          </span>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+          gap: 12
+        }}>
+          {/* Stage 1 */}
+          <div style={{
+            background: 'var(--bg-subtle)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 10,
+            padding: '12px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10
+          }}>
+            <div style={{
+              width: 32,
+              height: 32,
+              borderRadius: '50%',
+              background: 'var(--emerald)',
+              color: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 800,
+              fontSize: '0.82rem',
+              flexShrink: 0
+            }}>
+              ✓
+            </div>
+            <div>
+              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-main)' }}>Resume & ATS</div>
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                {Math.round(data.resume_overall_score || 0)}/100 Audited
+              </div>
+            </div>
+          </div>
+
+          {/* Stage 2 */}
+          <div style={{
+            background: 'var(--bg-subtle)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 10,
+            padding: '12px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10
+          }}>
+            <div style={{
+              width: 32,
+              height: 32,
+              borderRadius: '50%',
+              background: data.github_signals ? 'var(--emerald)' : 'var(--amber)',
+              color: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 800,
+              fontSize: '0.82rem',
+              flexShrink: 0
+            }}>
+              {data.github_signals ? '✓' : '2'}
+            </div>
+            <div>
+              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-main)' }}>GitHub Footprint</div>
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                {data.github_signals ? `${data.github_signals.public_repos || 0} Repos Verified` : 'Pending Authentication'}
+              </div>
+            </div>
+          </div>
+
+          {/* Stage 3 */}
+          <div style={{
+            background: 'var(--bg-subtle)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 10,
+            padding: '12px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10
+          }}>
+            <div style={{
+              width: 32,
+              height: 32,
+              borderRadius: '50%',
+              background: data.leetcode_signals ? 'var(--emerald)' : 'var(--amber)',
+              color: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 800,
+              fontSize: '0.82rem',
+              flexShrink: 0
+            }}>
+              {data.leetcode_signals ? '✓' : '3'}
+            </div>
+            <div>
+              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-main)' }}>DSA Algorithms</div>
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                {data.leetcode_signals ? `${data.leetcode_signals.total_solved || 0} Problems Solved` : 'Target Benchmarked'}
+              </div>
+            </div>
+          </div>
+
+          {/* Stage 4 */}
+          <div style={{
+            background: 'var(--bg-subtle)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 10,
+            padding: '12px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10
+          }}>
+            <div style={{
+              width: 32,
+              height: 32,
+              borderRadius: '50%',
+              background: 'var(--primary)',
+              color: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 800,
+              fontSize: '0.82rem',
+              flexShrink: 0
+            }}>
+              4
+            </div>
+            <div>
+              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-main)' }}>Market Fit</div>
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                {data.job_matches?.length || 0} Roles Mapped
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Custom Job Description Highlight Banner if matched */}
       {data.custom_jd_match && (
         <div className="card-solid" style={{

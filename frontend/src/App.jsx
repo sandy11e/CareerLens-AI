@@ -13,6 +13,7 @@ import CrossVerificationSection from './components/CrossVerificationSection';
 import JobMatchesSection from './components/JobMatchesSection';
 import RoadmapSection from './components/RoadmapSection';
 import CopilotChat from './components/CopilotChat';
+import HistoryModal from './components/HistoryModal';
 import api from './api';
 
 export default function App() {
@@ -27,6 +28,7 @@ export default function App() {
   const [lastParams, setLastParams] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [groqStatus, setGroqStatus] = useState({ groq_active: false });
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   // Initial health check and token verification
   useEffect(() => {
@@ -155,6 +157,15 @@ export default function App() {
     setCurrentView('landing');
   };
 
+  const handleLoadEvaluation = (loadedAnalysis) => {
+    setAnalysisData(loadedAnalysis);
+    setError(null);
+    setIsLoading(false);
+    setCurrentView('app');
+    setActiveTab('overview');
+    setIsHistoryOpen(false);
+  };
+
   // Guard: require authentication for the application analysis page
   useEffect(() => {
     if (currentView === 'app' && !currentUser) {
@@ -179,6 +190,7 @@ export default function App() {
         currentUser={currentUser}
         onLogout={handleLogout}
         onOpenAuth={handleOpenAuth}
+        onOpenHistory={() => setIsHistoryOpen(true)}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         hasData={!!analysisData}
@@ -285,7 +297,17 @@ export default function App() {
           >
             Evaluate Profile
           </button>
-          <span>•</span>
+          {currentUser && (
+            <>
+              <button 
+                onClick={() => setIsHistoryOpen(true)} 
+                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.8rem' }}
+              >
+                Audit History
+              </button>
+              <span>•</span>
+            </>
+          )}
           {!currentUser ? (
             <button 
               onClick={() => handleOpenAuth('login')} 
@@ -306,6 +328,14 @@ export default function App() {
           CareerLens AI • Next-Generation Candidate Verification & Career Intelligence
         </div>
       </footer>
+
+      {/* Full Audit History Modal */}
+      <HistoryModal
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        onLoadEvaluation={handleLoadEvaluation}
+        currentEvaluationId={analysisData?.evaluation_id}
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://devlyzer-ai.onrender.com';
 
 const client = axios.create({
   baseURL: API_BASE_URL,
@@ -169,6 +169,22 @@ export const api = {
 
   async clearChatHistory(evaluationId = 'latest') {
     const res = await client.delete(`/api/chat/history?evaluation_id=${encodeURIComponent(evaluationId)}`);
+    return res.data;
+  },
+
+  // Full Analysis Audit History (MongoDB Atlas)
+  async getEvaluationHistory() {
+    const res = await client.get('/api/evaluations/history');
+    return res.data;
+  },
+
+  async getEvaluationDetail(evaluationId) {
+    const res = await client.get(`/api/evaluations/${encodeURIComponent(evaluationId)}`);
+    return res.data;
+  },
+
+  async deleteEvaluation(evaluationId) {
+    const res = await client.delete(`/api/evaluations/${encodeURIComponent(evaluationId)}`);
     return res.data;
   },
 };

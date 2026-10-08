@@ -305,6 +305,27 @@ export default function DevSignalsSection({ data }) {
                 </div>
               </div>
 
+              {/* Visual Difficulty Distribution Ratio Bar */}
+              {(() => {
+                const tot = (leetcode.easy || 0) + (leetcode.medium || 0) + (leetcode.hard || 0) || 1;
+                const ePct = ((leetcode.easy || 0) / tot) * 100;
+                const mPct = ((leetcode.medium || 0) / tot) * 100;
+                const hPct = ((leetcode.hard || 0) / tot) * 100;
+                return (
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600 }}>
+                      <span>Difficulty Proportions</span>
+                      <span>{leetcode.total_solved || 0} Solved</span>
+                    </div>
+                    <div className="visual-segmented-bar" style={{ height: 8 }}>
+                      <div style={{ width: `${ePct}%`, background: 'var(--emerald)' }} title={`Easy: ${leetcode.easy || 0}`} />
+                      <div style={{ width: `${mPct}%`, background: 'var(--amber)' }} title={`Medium: ${leetcode.medium || 0}`} />
+                      <div style={{ width: `${hPct}%`, background: 'var(--rose)' }} title={`Hard: ${leetcode.hard || 0}`} />
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* Ranking & Indices */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <div style={{ background: 'var(--bg-subtle)', padding: '10px 14px', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid var(--border-subtle)' }}>
