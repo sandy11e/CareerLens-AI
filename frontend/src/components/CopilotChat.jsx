@@ -67,6 +67,13 @@ const DEFAULT_FOLLOWUPS = [
   'How do I test this in production?'
 ];
 
+const THINKING_STEPS = [
+  'Thinking through your profile...',
+  'Articulating a tailored response...',
+  'Magnifying the key details...',
+  'Connecting the dots across your signals...'
+];
+
 // Helper: Custom Markdown & Code Formatter
 function MarkdownRenderer({ content }) {
   const [copiedCodeId, setCopiedCodeId] = useState(null);
@@ -352,7 +359,7 @@ function MarkdownRenderer({ content }) {
   );
 }
 
-export default function CopilotChat({ evaluationId, initialContext }) {
+export default function CopilotChat({ evaluationId, initialContext, historyResetKey }) {
   const [conversations, setConversations] = useState([
     { id: 'convo-default', title: 'Career Strategy Session', messages: [], createdAt: new Date() }
   ]);
@@ -360,6 +367,7 @@ export default function CopilotChat({ evaluationId, initialContext }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [thinkingStep, setThinkingStep] = useState(0);
   const [copiedMsgIdx, setCopiedMsgIdx] = useState(null);
   const [isListening, setIsListening] = useState(false);
   const [isSpeakingIdx, setIsSpeakingIdx] = useState(null);
@@ -412,10 +420,15 @@ export default function CopilotChat({ evaluationId, initialContext }) {
 
   // Load chat history from backend MongoDB
   useEffect(() => {
+    let isCurrent = true;
+    setMessages([]);
+    setConversations([{ id: 'convo-default', title: 'Career Strategy Session', messages: [], createdAt: new Date() }]);
+    setActiveConvoId('convo-default');
+
     async function loadHistory() {
       try {
         const res = await api.getChatHistory(evaluationId || 'latest');
-        if (res?.history && res.history.length > 0) {
+        if (isCurrent && res?.history && res.history.length > 0) {
           const loaded = res.history.map(m => ({
             role: m.role,
             content: m.content,
@@ -438,7 +451,19 @@ export default function CopilotChat({ evaluationId, initialContext }) {
       }
     }
     loadHistory();
-  }, [evaluationId]);
+    return () => { isCurrent = false; };
+  }, [evaluationId, historyResetKey]);
+
+  useEffect(() => {
+    if (!isSending) {
+      setThinkingStep(0);
+      return undefined;
+    }
+    const intervalId = window.setInterval(() => {
+      setThinkingStep((step) => (step + 1) % THINKING_STEPS.length);
+    }, 1400);
+    return () => window.clearInterval(intervalId);
+  }, [isSending]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -472,6 +497,19 @@ export default function CopilotChat({ evaluationId, initialContext }) {
     });
     setActiveConvoId(newId);
     setMessages([]);
+  };
+
+  const handleClearChat = async () => {
+    if (!messages.length || !window.confirm('Clear this conversation? This cannot be undone.')) return;
+    try {
+      await api.clearChatHistory(evaluationId || 'latest');
+      setMessages([]);
+      setConversations([{ id: 'convo-default', title: 'Career Strategy Session', messages: [], createdAt: new Date() }]);
+      setActiveConvoId('convo-default');
+    } catch (err) {
+      console.error('Could not clear chat history:', err);
+      window.alert(err.response?.data?.detail || 'Could not clear chat history. Please try again.');
+    }
   };
 
   const switchConversation = (convoId) => {
@@ -905,6 +943,17 @@ export default function CopilotChat({ evaluationId, initialContext }) {
             </button>
 
             <button
+              onClick={handleClearChat}
+              className="btn-ghost"
+              style={{ padding: 7 }}
+              title="Clear conversation"
+              aria-label="Clear conversation"
+              disabled={!messages.length || isSending}
+            >
+              <Trash2 size={16} />
+            </button>
+
+            <button
               onClick={() => setIsFullScreen(!isFullScreen)}
               className="btn-ghost"
               style={{ padding: 7, color: isFullScreen ? 'var(--primary)' : undefined }}
@@ -1332,7 +1381,7 @@ export default function CopilotChat({ evaluationId, initialContext }) {
                     ))}
                   </div>
                   <span style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
-                    Synthesizing 360° metrics & engineering intelligence...
+                    {THINKING_STEPS[thinkingStep]}
                   </span>
                 </div>
               </div>

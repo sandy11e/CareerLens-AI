@@ -124,9 +124,7 @@ export default function Navbar({
         {(!hasData || currentView !== 'app') && (
           <nav className="hide-on-mobile" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             {[
-              { label: 'Home', view: 'landing' },
-              { label: 'Features', scroll: 'features' },
-              { label: 'How It Works', scroll: 'how-it-works' },
+             
             ].map((item) => (
               <button
                 key={item.label}

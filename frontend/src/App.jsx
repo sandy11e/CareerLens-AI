@@ -30,6 +30,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('overview');
   const [groqStatus, setGroqStatus] = useState({ groq_active: false });
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [chatHistoryResetKey, setChatHistoryResetKey] = useState(0);
   const [commandSidebarOpen, setCommandSidebarOpen] = useState(() => typeof window !== 'undefined' ? window.innerWidth > 960 : true);
 
   // Theme Management (Persisted in localStorage with system preference fallback)
@@ -201,6 +202,12 @@ export default function App() {
     setIsHistoryOpen(false);
   };
 
+  const handleEvaluationDeleted = (evaluationId) => {
+    if (evaluationId === analysisData?.evaluation_id) {
+      setChatHistoryResetKey((key) => key + 1);
+    }
+  };
+
   // Guard: require authentication for the application analysis page
   useEffect(() => {
     if (currentView === 'app' && !currentUser) {
@@ -319,7 +326,11 @@ export default function App() {
                       />
                     )}
                     {activeTab === 'copilot' && (
-                      <CopilotChat evaluationId={analysisData.evaluation_id} initialContext={analysisData} />
+                      <CopilotChat
+                        evaluationId={analysisData.evaluation_id}
+                        initialContext={analysisData}
+                        historyResetKey={chatHistoryResetKey}
+                      />
                     )}
                   </div>
                 </div>
@@ -337,6 +348,7 @@ export default function App() {
         isOpen={isHistoryOpen}
         onClose={() => setIsHistoryOpen(false)}
         onLoadEvaluation={handleLoadEvaluation}
+        onEvaluationDeleted={handleEvaluationDeleted}
         currentEvaluationId={analysisData?.evaluation_id}
       />
     </div>

@@ -717,7 +717,7 @@ async def copilot_chat(
     user_id = user["id"] if user else (eval_id or "guest")
 
     # Load stored conversation history for this specific user
-    stored_msgs = get_chat_history(user_id, limit=30)
+    stored_msgs = get_chat_history(user_id, limit=30, evaluation_id=eval_id)
     chat_context = []
     for m in stored_msgs:
         chat_context.append({
@@ -762,7 +762,7 @@ async def fetch_chat_history(
         user = get_user_by_token(token)
 
     user_id = user["id"] if user else (evaluation_id or "guest")
-    messages = get_chat_history(user_id, limit=50)
+    messages = get_chat_history(user_id, limit=50, evaluation_id=evaluation_id)
     return {
         "user_id": user_id,
         "history": messages
@@ -782,7 +782,7 @@ async def clear_user_chat_history(
         user = get_user_by_token(token)
 
     user_id = user["id"] if user else (evaluation_id or "guest")
-    success = clear_chat_history(user_id)
+    success = clear_chat_history(user_id, evaluation_id=evaluation_id)
     return {
         "success": success,
         "message": "Conversation history cleared successfully."
@@ -863,6 +863,8 @@ async def remove_user_evaluation(
         raise HTTPException(status_code=401, detail="Invalid or expired session token.")
 
     deleted = delete_user_evaluation(user_id=user["id"], evaluation_id=evaluation_id)
+    if deleted:
+        clear_chat_history(user["id"], evaluation_id=evaluation_id)
     return {
         "success": deleted,
         "message": "Evaluation record deleted successfully." if deleted else "Evaluation not found or already deleted."

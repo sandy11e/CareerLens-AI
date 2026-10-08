@@ -46,7 +46,7 @@ export default function DnaTechBackground({
       { r: 6, g: 182, b: 212 },   // Neon Cyan
       { r: 139, g: 92, b: 246 },  // Electric Violet
       { r: 236, g: 72, b: 153 },  // Magenta Pink
-      { r: 249, g: 115, b: 22 },  // Flame Orange / Terracotta
+      { r: 59, g: 130, b: 246 },  // Electric Blue
       { r: 16, g: 185, b: 129 },  // Cyber Emerald
       { r: 245, g: 158, b: 11 }   // Amber Gold
     ];
@@ -109,7 +109,7 @@ export default function DnaTechBackground({
       // Can render diagonal or vertical across screen
       const centerX = width * 0.5 + mouseTiltX * 80;
       const centerY = height * 0.5 + mouseTiltY * 60;
-      const helixRadius = Math.min(width * 0.28, 220); // Width of the helix
+      const helixRadius = Math.min(width * 0.38, 360); // Width of the helix
       const totalSteps = Math.max(strandCount, Math.floor(height / 28));
       const verticalSpan = height * 1.2;
       const startY = centerY - verticalSpan * 0.5;
@@ -126,7 +126,7 @@ export default function DnaTechBackground({
         const currentY = startY + i * stepY;
 
         // Diagonal offset if diagonal mode enabled
-        const diagOffset = diagonal ? (progress - 0.5) * (width * 0.45) : 0;
+        const diagOffset = diagonal ? (progress - 0.5) * (width * 0.55) : 0;
         const strandCenterX = centerX + diagOffset;
 
         // Current rotation angle for this step

@@ -327,30 +327,45 @@ def save_chat_message(user_id: str, role: str, content: str, evaluation_id: str 
         memory_store.setdefault("conversations", {}).setdefault(user_id, []).append(msg)
     return msg
 
-def get_chat_history(user_id: str, limit: int = 50):
+def get_chat_history(user_id: str, limit: int = 50, evaluation_id: str = None):
     if not user_id:
         return []
+    query = {"user_id": user_id}
+    if evaluation_id:
+        query["evaluation_id"] = evaluation_id
     if db is not None:
         try:
             msgs = list(db.conversations.find(
-                {"user_id": user_id},
+                query,
                 {"_id": 0}
             ).sort("timestamp", 1).limit(limit))
             return msgs
         except Exception as e:
             logger.error(f"Error reading chat history from MongoDB: {e}")
     
-    return (memory_store.get("conversations") or {}).get(user_id, [])[-limit:]
+    messages = (memory_store.get("conversations") or {}).get(user_id, [])
+    if evaluation_id:
+        messages = [message for message in messages if message.get("evaluation_id") == evaluation_id]
+    return messages[-limit:]
 
-def clear_chat_history(user_id: str):
+def clear_chat_history(user_id: str, evaluation_id: str = None):
     if not user_id:
         return False
+    query = {"user_id": user_id}
+    if evaluation_id:
+        query["evaluation_id"] = evaluation_id
     if db is not None:
         try:
-            db.conversations.delete_many({"user_id": user_id})
+            db.conversations.delete_many(query)
         except Exception as e:
             logger.error(f"Error clearing chat history in MongoDB: {e}")
     if "conversations" in memory_store and user_id in memory_store["conversations"]:
-        memory_store["conversations"][user_id] = []
+        if evaluation_id:
+            memory_store["conversations"][user_id] = [
+                message for message in memory_store["conversations"][user_id]
+                if message.get("evaluation_id") != evaluation_id
+            ]
+        else:
+            memory_store["conversations"][user_id] = []
     return True
 

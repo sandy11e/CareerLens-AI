@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import api from '../api';
 
-export default function HistoryModal({ isOpen, onClose, onLoadEvaluation, currentEvaluationId }) {
+export default function HistoryModal({ isOpen, onClose, onLoadEvaluation, onEvaluationDeleted, currentEvaluationId }) {
   const [evaluations, setEvaluations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingDetailId, setLoadingDetailId] = useState(null);
@@ -64,6 +64,7 @@ export default function HistoryModal({ isOpen, onClose, onLoadEvaluation, curren
     try {
       await api.deleteEvaluation(evaluationId);
       setEvaluations(prev => prev.filter(item => item.id !== evaluationId));
+      onEvaluationDeleted?.(evaluationId);
     } catch (err) {
       console.error('Failed to delete evaluation:', err);
       alert(err.response?.data?.detail || 'Failed to delete evaluation.');

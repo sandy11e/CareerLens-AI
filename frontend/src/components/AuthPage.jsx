@@ -94,7 +94,7 @@ export default function AuthPage({ initialMode = 'login', onAuthSuccess, onBackH
       overflow: 'hidden'
     }}>
       {/* Live 3D Multicolor DNA Tech Background Animation */}
-      <DnaTechBackground opacity={0.88} diagonal={false} glow={true} />
+      <DnaTechBackground opacity={0.88} diagonal={true} glow={true} />
 
       {/* Main Centered Auth Card */}
       <div className="card-solid" style={{
