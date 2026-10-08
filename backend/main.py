@@ -12,7 +12,7 @@ from pydantic import BaseModel
 
 from config import GROQ_API_KEY, GROQ_MODEL, PORT
 from database import (
-    connect_db, save_evaluation, get_evaluations_by_user,
+    connect_db, get_db, save_evaluation, get_evaluations_by_user,
     create_user, authenticate_user, get_user_by_token
 )
 from services.groq_service import is_groq_configured
@@ -78,11 +78,13 @@ def root():
 
 @app.get("/api/health")
 def health_check():
+    db = get_db()
     return {
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat(),
         "groq_active": is_groq_configured(),
         "groq_model": GROQ_MODEL,
+        "mongodb_connected": db is not None,
         "features": [
             "Precision Resume Parsing & Extraction",
             "ATS 6-Metric Breakdown",
