@@ -52,17 +52,23 @@ export default function App() {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
   };
 
-  // Initial health check and token verification
+  // Initial health check, warm-up ping, and periodic heartbeat (every 8 minutes)
   useEffect(() => {
     async function checkBackend() {
       try {
         const health = await api.checkHealth();
         setGroqStatus(health);
       } catch (err) {
-        console.warn('Backend offline:', err);
+        console.warn('Backend warm-up ping failed:', err);
       }
     }
+    // Instant pre-warm ping on page load
     checkBackend();
+
+    // Heartbeat ping every 8 minutes to prevent Render free-tier sleep while tab is open
+    const heartbeatInterval = setInterval(() => {
+      checkBackend();
+    }, 8 * 60 * 1000);
 
     // Verify session if token stored
     async function verifyUser() {
@@ -81,6 +87,8 @@ export default function App() {
       }
     }
     verifyUser();
+
+    return () => clearInterval(heartbeatInterval);
   }, []);
 
   // Main evaluation trigger
