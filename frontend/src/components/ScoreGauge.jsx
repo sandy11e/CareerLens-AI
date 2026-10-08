@@ -26,7 +26,7 @@ export default function ScoreGauge({ score = 0, size = 110, strokeWidth = 8, lab
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke="#e2e8f0"
+            stroke="var(--border-medium, #e2e8f0)"
             strokeWidth={strokeWidth}
             fill="transparent"
           />

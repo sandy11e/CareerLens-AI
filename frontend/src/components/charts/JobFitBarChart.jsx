@@ -38,6 +38,8 @@ export default function JobFitBarChart({ jobs = [] }) {
     ]
   };
 
+  const isDark = typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark';
+
   const options = {
     indexAxis: 'y',
     responsive: true,
@@ -46,12 +48,12 @@ export default function JobFitBarChart({ jobs = [] }) {
       x: {
         min: 0,
         max: 100,
-        grid: { color: '#f1f5f9' },
-        ticks: { color: '#64748b', font: { family: 'Inter', size: 10 } }
+        grid: { color: isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9' },
+        ticks: { color: isDark ? '#94a3b8' : '#64748b', font: { family: 'Inter', size: 10 } }
       },
       y: {
         grid: { display: false },
-        ticks: { color: '#334155', font: { family: 'Inter', size: 11, weight: '500' } }
+        ticks: { color: isDark ? '#f1f5f9' : '#334155', font: { family: 'Inter', size: 11, weight: '500' } }
       }
     },
     plugins: {

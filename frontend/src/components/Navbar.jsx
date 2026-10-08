@@ -2,7 +2,7 @@ import React from 'react';
 import { 
   Layers, FileText, Code2, ShieldCheck, Briefcase, 
   MessageSquare, Compass, RotateCcw, User, LogOut, 
-  Home, History, Menu, X, Sparkles
+  Home, History, Menu, X, Sparkles, Sun, Moon
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -16,7 +16,9 @@ export default function Navbar({
   setActiveTab, 
   hasData, 
   onReset, 
-  groqStatus 
+  groqStatus,
+  theme,
+  toggleTheme
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
@@ -35,7 +37,7 @@ export default function Navbar({
       position: 'sticky',
       top: 0,
       zIndex: 50,
-      background: 'rgba(250, 251, 253, 0.85)',
+      background: 'var(--header-bg)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
       borderBottom: '1px solid var(--border-subtle)',
@@ -286,6 +288,34 @@ export default function Navbar({
             </div>
           )}
 
+          {/* Theme Toggle Button (Desktop & Mobile) */}
+          <button
+            onClick={toggleTheme}
+            className="btn-ghost"
+            style={{
+              padding: '6px 8px',
+              borderRadius: 9,
+              border: '1px solid var(--border-subtle)',
+              background: 'var(--bg-subtle)',
+              color: 'var(--text-main)',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: 34,
+              minWidth: 34,
+              transition: 'all 0.2s ease',
+            }}
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            aria-label="Toggle dark/light theme"
+          >
+            {theme === 'dark' ? (
+              <Sun size={16} color="#fbbf24" />
+            ) : (
+              <Moon size={16} color="var(--primary)" />
+            )}
+          </button>
+
           {/* Mobile hamburger toggle */}
           <button
             className="show-on-mobile btn-ghost"
@@ -305,7 +335,7 @@ export default function Navbar({
           overflowX: 'auto',
           padding: '6px 10px',
           borderTop: '1px solid var(--border-subtle)',
-          background: 'rgba(255, 255, 255, 0.95)',
+          background: 'var(--bg-glass)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           display: 'none',
@@ -482,6 +512,20 @@ export default function Navbar({
                   <ShieldCheck size={17} color="var(--emerald)" />
                   <span>How It Works</span>
                 </div>
+              </div>
+
+              {/* Theme Switcher in Mobile Drawer */}
+              <div
+                className="mobile-nav-link"
+                onClick={() => toggleTheme()}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  {theme === 'dark' ? <Sun size={17} color="#fbbf24" /> : <Moon size={17} color="var(--primary)" />}
+                  <span>{theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}</span>
+                </div>
+                <span className="badge badge-slate" style={{ fontSize: '0.66rem' }}>
+                  {theme === 'dark' ? 'Dark' : 'Light'}
+                </span>
               </div>
             </div>
 

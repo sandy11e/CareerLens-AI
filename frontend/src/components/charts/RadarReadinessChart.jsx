@@ -26,6 +26,8 @@ export default function RadarReadinessChart({ data }) {
   const dev = data.developer_readiness || {};
   const cross = data.cross_verification || {};
 
+  const isDark = typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark';
+
   const chartData = {
     labels: [
       'ATS Compatibility',
@@ -46,21 +48,21 @@ export default function RadarReadinessChart({ data }) {
           dev.collaboration_score || 55,
           cross.trust_score || 75
         ],
-        backgroundColor: 'rgba(37, 99, 235, 0.15)',
-        borderColor: '#2563eb',
+        backgroundColor: isDark ? 'rgba(129, 140, 248, 0.25)' : 'rgba(37, 99, 235, 0.15)',
+        borderColor: isDark ? '#818cf8' : '#2563eb',
         borderWidth: 2,
-        pointBackgroundColor: '#2563eb',
+        pointBackgroundColor: isDark ? '#818cf8' : '#2563eb',
         pointBorderColor: '#ffffff',
         pointHoverBackgroundColor: '#ffffff',
-        pointHoverBorderColor: '#2563eb',
+        pointHoverBorderColor: isDark ? '#818cf8' : '#2563eb',
         pointRadius: 4,
         pointHoverRadius: 6,
       },
       {
         label: 'Benchmark Target (80%)',
         data: [80, 80, 80, 80, 80, 80],
-        backgroundColor: 'rgba(226, 232, 240, 0.2)',
-        borderColor: '#94a3b8',
+        backgroundColor: isDark ? 'rgba(51, 65, 85, 0.3)' : 'rgba(226, 232, 240, 0.2)',
+        borderColor: isDark ? '#64748b' : '#94a3b8',
         borderWidth: 1.5,
         borderDash: [4, 4],
         pointRadius: 0,
@@ -74,13 +76,13 @@ export default function RadarReadinessChart({ data }) {
     scales: {
       r: {
         angleLines: {
-          color: '#e2e8f0',
+          color: isDark ? '#223048' : '#e2e8f0',
         },
         grid: {
-          color: '#f1f5f9',
+          color: isDark ? '#1a253a' : '#f1f5f9',
         },
         pointLabels: {
-          color: '#334155',
+          color: isDark ? '#cbd5e1' : '#334155',
           font: {
             family: 'Inter',
             size: 11,
@@ -89,7 +91,7 @@ export default function RadarReadinessChart({ data }) {
         },
         ticks: {
           backdropColor: 'transparent',
-          color: '#94a3b8',
+          color: isDark ? '#64748b' : '#94a3b8',
           stepSize: 20,
           font: { size: 9 }
         },
@@ -101,7 +103,7 @@ export default function RadarReadinessChart({ data }) {
       legend: {
         position: 'bottom',
         labels: {
-          color: '#475569',
+          color: isDark ? '#cbd5e1' : '#475569',
           font: { family: 'Inter', size: 11, weight: '500' },
           padding: 12,
           boxWidth: 12

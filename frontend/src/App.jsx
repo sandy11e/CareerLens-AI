@@ -30,6 +30,28 @@ export default function App() {
   const [groqStatus, setGroqStatus] = useState({ groq_active: false });
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
+  // Theme Management (Persisted in localStorage with system preference fallback)
+  const [theme, setTheme] = useState(() => {
+    try {
+      const saved = localStorage.getItem('careerlens_theme');
+      if (saved) return saved;
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    } catch {
+      return 'light';
+    }
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    try {
+      localStorage.setItem('careerlens_theme', theme);
+    } catch {}
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
   // Initial health check and token verification
   useEffect(() => {
     async function checkBackend() {
@@ -196,6 +218,8 @@ export default function App() {
         hasData={!!analysisData}
         onReset={handleReset}
         groqStatus={groqStatus}
+        theme={theme}
+        toggleTheme={toggleTheme}
       />
 
       {/* Main Content Area */}
@@ -280,7 +304,7 @@ export default function App() {
         textAlign: 'center',
         color: 'var(--text-muted)',
         fontSize: '0.8rem',
-        background: '#ffffff',
+        background: 'var(--bg-surface)',
         marginTop: 'auto'
       }}>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 6 }}>
