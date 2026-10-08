@@ -38,3 +38,22 @@ export function LinkedinIcon({ size = 20, color = 'currentColor', style = {} }) 
     </svg>
   );
 }
+
+export function LeetCodeIcon({ size = 20, color = 'currentColor', style = {} }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={style}
+    >
+      <path d="M16 3l-6 6a3 3 0 0 0 0 4.24l6 6" />
+      <path d="M8 12h12" />
+    </svg>
+  );
+}

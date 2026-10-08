@@ -1,7 +1,22 @@
 import React from 'react';
-import { Layers, FileText, Code2, ShieldCheck, Briefcase, MessageSquare, Compass, RotateCcw, CheckCircle2 } from 'lucide-react';
+import { 
+  Layers, FileText, Code2, ShieldCheck, Briefcase, 
+  MessageSquare, Compass, RotateCcw, User, LogOut, 
+  Home, ArrowRight, Sparkles 
+} from 'lucide-react';
 
-export default function Navbar({ activeTab, setActiveTab, hasData, onReset, groqStatus }) {
+export default function Navbar({ 
+  currentView, 
+  onNavigate, 
+  currentUser, 
+  onLogout, 
+  onOpenAuth, 
+  activeTab, 
+  setActiveTab, 
+  hasData, 
+  onReset, 
+  groqStatus 
+}) {
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Layers },
     { id: 'roadmap', label: 'Action Roadmap', icon: Compass },
@@ -25,7 +40,14 @@ export default function Navbar({ activeTab, setActiveTab, hasData, onReset, groq
         {/* Brand */}
         <div 
           style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} 
-          onClick={() => setActiveTab('overview')}
+          onClick={() => {
+            if (hasData) {
+              setActiveTab('overview');
+              onNavigate('app');
+            } else {
+              onNavigate('landing');
+            }
+          }}
         >
           <div style={{
             width: 34,
@@ -45,7 +67,7 @@ export default function Navbar({ activeTab, setActiveTab, hasData, onReset, groq
                 CareerLens
               </span>
               <span className="badge badge-slate" style={{ fontSize: '0.68rem', padding: '1px 7px' }}>
-                PRO
+                AI
               </span>
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }} className="hide-on-mobile">
@@ -55,7 +77,7 @@ export default function Navbar({ activeTab, setActiveTab, hasData, onReset, groq
         </div>
 
         {/* Navigation Tabs (visible when analysis data exists) */}
-        {hasData && (
+        {hasData && currentView === 'app' && (
           <nav className="nav-scroll-container" style={{
             background: 'var(--bg-subtle)',
             padding: '4px',
@@ -94,9 +116,46 @@ export default function Navbar({ activeTab, setActiveTab, hasData, onReset, groq
           </nav>
         )}
 
-        {/* Right Status & Actions */}
+        {/* Simple navigation when on Landing or pre-evaluation */}
+        {(!hasData || currentView !== 'app') && (
+          <nav className="hide-on-mobile" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <button
+              onClick={() => onNavigate('landing')}
+              style={{
+                background: currentView === 'landing' ? 'var(--bg-subtle)' : 'transparent',
+                border: 'none',
+                padding: '7px 14px',
+                borderRadius: 8,
+                fontSize: '0.84rem',
+                fontWeight: currentView === 'landing' ? 700 : 500,
+                color: currentView === 'landing' ? 'var(--text-main)' : 'var(--text-secondary)',
+                cursor: 'pointer'
+              }}
+            >
+              Home
+            </button>
+            <button
+              onClick={() => onNavigate('app')}
+              style={{
+                background: currentView === 'app' ? 'var(--bg-subtle)' : 'transparent',
+                border: 'none',
+                padding: '7px 14px',
+                borderRadius: 8,
+                fontSize: '0.84rem',
+                fontWeight: currentView === 'app' ? 700 : 500,
+                color: currentView === 'app' ? 'var(--text-main)' : 'var(--text-secondary)',
+                cursor: 'pointer'
+              }}
+            >
+              Evaluate Profile
+            </button>
+          </nav>
+        )}
+
+        {/* Right Status & Auth Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {hasData && (
+          {/* New Audit button if evaluated */}
+          {hasData && currentView === 'app' && (
             <button
               onClick={onReset}
               className="btn-secondary"
@@ -108,6 +167,7 @@ export default function Navbar({ activeTab, setActiveTab, hasData, onReset, groq
             </button>
           )}
 
+          {/* Engine Status Dot */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -126,9 +186,56 @@ export default function Navbar({ activeTab, setActiveTab, hasData, onReset, groq
               background: groqStatus?.groq_active ? 'var(--emerald)' : 'var(--amber)'
             }} />
             <span className="hide-on-mobile">
-              {groqStatus?.groq_active ? 'Engine Online' : 'Local Fallback'}
+              {groqStatus?.groq_active ? 'Groq AI Active' : 'Local Fallback'}
             </span>
           </div>
+
+          {/* Auth State Button */}
+          {currentUser ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                background: 'var(--bg-subtle)',
+                border: '1px solid var(--border-subtle)',
+                padding: '5px 10px',
+                borderRadius: 8,
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                color: 'var(--text-main)'
+              }}>
+                <User size={14} color="var(--primary)" />
+                <span className="hide-on-mobile">{currentUser.name || currentUser.email}</span>
+              </div>
+              <button
+                onClick={onLogout}
+                className="btn-secondary"
+                style={{ padding: '5px 10px', fontSize: '0.76rem' }}
+                title="Sign out of your account"
+              >
+                <LogOut size={13} />
+                <span className="hide-on-mobile">Sign Out</span>
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button
+                onClick={() => onOpenAuth('login')}
+                className="btn-secondary"
+                style={{ padding: '6px 14px', fontSize: '0.82rem' }}
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => onOpenAuth('register')}
+                className="btn-primary hide-on-mobile"
+                style={{ padding: '6px 14px', fontSize: '0.82rem' }}
+              >
+                Register
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

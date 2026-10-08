@@ -6,12 +6,15 @@ from datetime import datetime
 from typing import Optional, List, Dict, Any
 from pathlib import Path
 
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Query, Body
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Query, Body, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from config import GROQ_API_KEY, GROQ_MODEL, PORT
-from database import connect_db, save_evaluation, get_evaluations_by_user
+from database import (
+    connect_db, save_evaluation, get_evaluations_by_user,
+    create_user, authenticate_user, get_user_by_token
+)
 from services.groq_service import is_groq_configured
 from services.resume_parser import extract_text_from_pdf
 from services.resume_analyzer import analyze_resume_precisely
@@ -90,6 +93,57 @@ def health_check():
             "Career Copilot Chat"
         ]
     }
+
+# ----------------- AUTHENTICATION ENDPOINTS -----------------
+
+class RegisterRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+@app.post("/api/auth/register")
+def register(payload: RegisterRequest):
+    if not payload.name or not payload.name.strip():
+        raise HTTPException(status_code=400, detail="Name is required.")
+    if not payload.email or not payload.email.strip() or "@" not in payload.email:
+        raise HTTPException(status_code=400, detail="Valid email address is required.")
+    if len(payload.password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters.")
+    try:
+        return create_user(payload.name, payload.email, payload.password)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Registration error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create user account.")
+
+@app.post("/api/auth/login")
+def login(payload: LoginRequest):
+    if not payload.email or not payload.email.strip() or not payload.password:
+        raise HTTPException(status_code=400, detail="Email and password are required.")
+    try:
+        return authenticate_user(payload.email, payload.password)
+    except ValueError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    except Exception as e:
+        logger.error(f"Login error: {e}")
+        raise HTTPException(status_code=500, detail="Login service error.")
+
+@app.get("/api/auth/me")
+def get_current_user(authorization: Optional[str] = Header(None)):
+    token = None
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split("Bearer ", 1)[1].strip()
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing or invalid authentication token.")
+    user = get_user_by_token(token)
+    if not user:
+        raise HTTPException(status_code=401, detail="Session expired or invalid.")
+    return {"user": user}
 
 # ----------------- RESUME ENDPOINTS -----------------
 

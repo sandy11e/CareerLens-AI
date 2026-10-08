@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import Navbar from './components/Navbar';
+import LandingPage from './components/LandingPage';
+import AuthPage from './components/AuthPage';
 import HeroUpload from './components/HeroUpload';
 import LoadingProgress from './components/LoadingProgress';
 import ErrorAlert from './components/ErrorAlert';
@@ -14,6 +16,10 @@ import CopilotChat from './components/CopilotChat';
 import api from './api';
 
 export default function App() {
+  const [currentView, setCurrentView] = useState('landing'); // 'landing' | 'app' | 'auth'
+  const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
+  const [currentUser, setCurrentUser] = useState(() => api.getSavedUser());
+  
   const [analysisData, setAnalysisData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -22,7 +28,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('overview');
   const [groqStatus, setGroqStatus] = useState({ groq_active: false });
 
-  // Initial health check
+  // Initial health check and token verification
   useEffect(() => {
     async function checkBackend() {
       try {
@@ -33,6 +39,24 @@ export default function App() {
       }
     }
     checkBackend();
+
+    // Verify session if token stored
+    async function verifyUser() {
+      const token = localStorage.getItem('careerlens_token');
+      if (token) {
+        try {
+          const res = await api.getMe();
+          if (res?.user) {
+            setCurrentUser(res.user);
+          }
+        } catch {
+          // Token expired or invalid
+          api.logout();
+          setCurrentUser(null);
+        }
+      }
+    }
+    verifyUser();
   }, []);
 
   // Main evaluation trigger
@@ -41,6 +65,7 @@ export default function App() {
     setError(null);
     setUploadProgress(0);
     setLastParams({ file, githubUsername, leetcodeUsername });
+    setCurrentView('app');
 
     try {
       const result = await api.evaluateUnified({
@@ -101,12 +126,38 @@ export default function App() {
     setError(null);
     setIsLoading(false);
     setActiveTab('overview');
+    setCurrentView('app');
+  };
+
+  const handleStartAudit = () => {
+    setCurrentView('app');
+  };
+
+  const handleOpenAuth = (mode = 'login') => {
+    setAuthMode(mode);
+    setCurrentView('auth');
+  };
+
+  const handleAuthSuccess = (userData) => {
+    setCurrentUser(userData);
+    // After login, proceed to the evaluation portal
+    setCurrentView('app');
+  };
+
+  const handleLogout = () => {
+    api.logout();
+    setCurrentUser(null);
   };
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Top Navigation */}
       <Navbar
+        currentView={currentView}
+        onNavigate={setCurrentView}
+        currentUser={currentUser}
+        onLogout={handleLogout}
+        onOpenAuth={handleOpenAuth}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         hasData={!!analysisData}
@@ -114,66 +165,122 @@ export default function App() {
         groqStatus={groqStatus}
       />
 
-      {/* Main Content Area - Full Screen & Responsive */}
+      {/* Main Content Area */}
       <main className="app-main-container">
-        {/* Loading Pipeline State */}
-        {isLoading && (
-          <LoadingProgress uploadProgress={uploadProgress} />
+        {/* VIEW 1: LANDING PAGE */}
+        {currentView === 'landing' && !analysisData && !isLoading && (
+          <LandingPage
+            onStartAudit={handleStartAudit}
+            onOpenAuth={handleOpenAuth}
+          />
         )}
 
-        {/* Error State */}
-        {!isLoading && error && (
-          <ErrorAlert error={error} onRetry={() => lastParams && handleAnalyze(lastParams)} />
+        {/* VIEW 2: AUTHENTICATION PAGE (LOGIN / REGISTER) */}
+        {currentView === 'auth' && (
+          <AuthPage
+            initialMode={authMode}
+            onAuthSuccess={handleAuthSuccess}
+            onBackHome={() => setCurrentView('landing')}
+          />
         )}
 
-        {/* Initial Portal State: Upload & Inputs */}
-        {!isLoading && !error && !analysisData && (
-          <HeroUpload onAnalyze={handleAnalyze} isLoading={isLoading} />
-        )}
+        {/* VIEW 3: APPLICATION (EVALUATION OR DASHBOARD) */}
+        {currentView === 'app' && (
+          <>
+            {/* Loading Pipeline State */}
+            {isLoading && (
+              <LoadingProgress uploadProgress={uploadProgress} />
+            )}
 
-        {/* Evaluated Dashboard View */}
-        {!isLoading && !error && analysisData && (
-          <div>
-            {activeTab === 'overview' && (
-              <OverviewSection data={analysisData} setActiveTab={setActiveTab} />
+            {/* Error State */}
+            {!isLoading && error && (
+              <ErrorAlert error={error} onRetry={() => lastParams && handleAnalyze(lastParams)} />
             )}
-            {activeTab === 'roadmap' && (
-              <RoadmapSection data={analysisData} onRoadmapUpdate={handleRoadmapUpdate} />
+
+            {/* Initial Portal State: Upload & Inputs */}
+            {!isLoading && !error && !analysisData && (
+              <HeroUpload onAnalyze={handleAnalyze} isLoading={isLoading} />
             )}
-            {activeTab === 'resume' && (
-              <ResumeSection data={analysisData} />
+
+            {/* Evaluated Dashboard View */}
+            {!isLoading && !error && analysisData && (
+              <div>
+                {activeTab === 'overview' && (
+                  <OverviewSection data={analysisData} setActiveTab={setActiveTab} />
+                )}
+                {activeTab === 'roadmap' && (
+                  <RoadmapSection data={analysisData} onRoadmapUpdate={handleRoadmapUpdate} />
+                )}
+                {activeTab === 'resume' && (
+                  <ResumeSection data={analysisData} />
+                )}
+                {activeTab === 'dev' && (
+                  <DevSignalsSection data={analysisData} />
+                )}
+                {activeTab === 'verification' && (
+                  <CrossVerificationSection data={analysisData} />
+                )}
+                {activeTab === 'jobs' && (
+                  <JobMatchesSection
+                    data={analysisData}
+                    onJdMatchUpdate={handleCustomJdUpdate}
+                    onRoadmapUpdate={handleRoadmapUpdate}
+                    setActiveTab={setActiveTab}
+                  />
+                )}
+                {activeTab === 'copilot' && (
+                  <CopilotChat evaluationId={analysisData.evaluation_id} initialContext={analysisData} />
+                )}
+              </div>
             )}
-            {activeTab === 'dev' && (
-              <DevSignalsSection data={analysisData} />
-            )}
-            {activeTab === 'verification' && (
-              <CrossVerificationSection data={analysisData} />
-            )}
-            {activeTab === 'jobs' && (
-              <JobMatchesSection
-                data={analysisData}
-                onJdMatchUpdate={handleCustomJdUpdate}
-                onRoadmapUpdate={handleRoadmapUpdate}
-                setActiveTab={setActiveTab}
-              />
-            )}
-            {activeTab === 'copilot' && (
-              <CopilotChat evaluationId={analysisData.evaluation_id} initialContext={analysisData} />
-            )}
-          </div>
+          </>
         )}
       </main>
 
       {/* Footer */}
       <footer style={{
         borderTop: '1px solid var(--border-subtle)',
-        padding: '18px 20px',
+        padding: '24px 20px',
         textAlign: 'center',
         color: 'var(--text-muted)',
-        fontSize: '0.78rem',
-        background: '#ffffff'
+        fontSize: '0.8rem',
+        background: '#ffffff',
+        marginTop: 'auto'
       }}>
-        CareerLens • Candidate Verification & Career Intelligence Platform
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 6 }}>
+          <button 
+            onClick={() => setCurrentView('landing')} 
+            style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.8rem' }}
+          >
+            Home
+          </button>
+          <span>•</span>
+          <button 
+            onClick={() => setCurrentView('app')} 
+            style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.8rem' }}
+          >
+            Evaluate Profile
+          </button>
+          <span>•</span>
+          {!currentUser ? (
+            <button 
+              onClick={() => handleOpenAuth('login')} 
+              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.8rem' }}
+            >
+              Sign In
+            </button>
+          ) : (
+            <button 
+              onClick={handleLogout} 
+              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.8rem' }}
+            >
+              Sign Out
+            </button>
+          )}
+        </div>
+        <div>
+          CareerLens AI • Next-Generation Candidate Verification & Career Intelligence
+        </div>
       </footer>
     </div>
   );

@@ -7,7 +7,54 @@ const client = axios.create({
   timeout: 120000, // 2 minutes for deep AI extraction
 });
 
+// Attach auth token if available
+client.interceptors.request.use((config) => {
+  const token = localStorage.getItem('careerlens_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export const api = {
+  // Authentication
+  async register({ name, email, password }) {
+    const res = await client.post('/api/auth/register', { name, email, password });
+    if (res.data?.token) {
+      localStorage.setItem('careerlens_token', res.data.token);
+      localStorage.setItem('careerlens_user', JSON.stringify(res.data.user));
+    }
+    return res.data;
+  },
+
+  async login({ email, password }) {
+    const res = await client.post('/api/auth/login', { email, password });
+    if (res.data?.token) {
+      localStorage.setItem('careerlens_token', res.data.token);
+      localStorage.setItem('careerlens_user', JSON.stringify(res.data.user));
+    }
+    return res.data;
+  },
+
+  async getMe() {
+    const res = await client.get('/api/auth/me');
+    return res.data;
+  },
+
+  logout() {
+    localStorage.removeItem('careerlens_token');
+    localStorage.removeItem('careerlens_user');
+  },
+
+  getSavedUser() {
+    try {
+      const stored = localStorage.getItem('careerlens_user');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  },
+
   // System Health
   async checkHealth() {
     try {

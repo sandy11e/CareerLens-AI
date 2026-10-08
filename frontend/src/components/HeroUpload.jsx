@@ -58,12 +58,6 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
     });
   };
 
-  const loadDemo = () => {
-    setGithubUser('sandy11e');
-    setLeetcodeUser('sandy11e');
-    setValidationError('');
-  };
-
   return (
     <div className="hero-upload-container">
       {/* Header */}
@@ -317,31 +311,24 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
             flexWrap: 'wrap',
             gap: 12
           }}>
-            <button
-              type="button"
-              onClick={loadDemo}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--primary)',
-                fontSize: '0.82rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4
-              }}
-            >
-              <span>Load sample profile (`sandy11e`)</span>
-            </button>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              color: 'var(--text-muted)',
+              fontSize: '0.78rem'
+            }}>
+              <CheckCircle2 size={14} color="var(--emerald)" />
+              <span>Resume and engineering signals analyzed privately & securely</span>
+            </div>
 
             <button
               type="submit"
               disabled={isLoading}
               className="btn-primary"
-              style={{ padding: '12px 24px', fontSize: '0.9rem' }}
+              style={{ padding: '12px 28px', fontSize: '0.92rem' }}
             >
-              <span>{isLoading ? 'Running Pipeline...' : 'Evaluate Profile'}</span>
+              <span>{isLoading ? 'Running Pipeline...' : 'Evaluate Developer Profile'}</span>
               <ArrowRight size={16} />
             </button>
           </div>
