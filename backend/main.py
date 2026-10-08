@@ -14,7 +14,8 @@ from config import GROQ_API_KEY, GROQ_MODEL, PORT
 from database import (
     connect_db, get_db, save_evaluation, get_evaluations_by_user,
     create_user, authenticate_user, get_user_by_token,
-    save_chat_message, get_chat_history, clear_chat_history
+    save_chat_message, get_chat_history, clear_chat_history,
+    save_full_evaluation, get_user_evaluations, get_user_evaluation_detail, delete_user_evaluation
 )
 from services.groq_service import is_groq_configured
 from services.resume_parser import extract_text_from_pdf
@@ -302,7 +303,8 @@ async def evaluate_unified_profile(
     target_role: Optional[str] = Form(None),
     file: Optional[UploadFile] = File(None),
     jd_text: Optional[str] = Form(None),
-    jd_file: Optional[UploadFile] = File(None)
+    jd_file: Optional[UploadFile] = File(None),
+    authorization: Optional[str] = Header(None)
 ):
     """
     THE 360° TALENT EVALUATION:
@@ -515,17 +517,16 @@ async def evaluate_unified_profile(
         logger.error(f"Error generating roadmap: {e}")
         response_payload["roadmap"] = None
 
-    # Save to MongoDB or in-memory
-    save_evaluation({
-        "id": response_payload["evaluation_id"],
-        "candidate_name": response_payload["candidate_info"].get("name"),
-        "github_username": effective_github,
-        "leetcode_username": leetcode_username,
-        "target_role": target_role,
-        "holistic_score": holistic_score,
-        "resume_overall_score": resume_overall,
-        "created_at": datetime.utcnow()
-    })
+    # Resolve user_id if token provided
+    user_id = "guest"
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split("Bearer ", 1)[1].strip()
+        user = get_user_by_token(token)
+        if user:
+            user_id = user["id"]
+
+    # Save complete 360° evaluation record to MongoDB tagged with user_id
+    save_full_evaluation(user_id=user_id, record=response_payload)
 
     # Cache for chat copilot & custom JD matchers
     active_sessions[response_payload["evaluation_id"]] = {
@@ -735,6 +736,86 @@ async def clear_user_chat_history(
     return {
         "success": success,
         "message": "Conversation history cleared successfully."
+    }
+
+
+# ----------------- FULL EVALUATION AUDIT HISTORY ENDPOINTS -----------------
+
+@app.get("/api/evaluations/history")
+async def fetch_evaluation_history(
+    authorization: Optional[str] = Header(None)
+):
+    """
+    Retrieve full audit history summary records for the authenticated user from MongoDB.
+    """
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Authentication required to view evaluation history.")
+
+    token = authorization.split("Bearer ", 1)[1].strip()
+    user = get_user_by_token(token)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid or expired session token.")
+
+    records = get_user_evaluations(user_id=user["id"], limit=50)
+    return {
+        "user_id": user["id"],
+        "evaluations": records
+    }
+
+@app.get("/api/evaluations/{evaluation_id}")
+async def fetch_evaluation_detail(
+    evaluation_id: str,
+    authorization: Optional[str] = Header(None)
+):
+    """
+    Retrieve complete 360° analysis detail for a specific past evaluation to restore the dashboard.
+    """
+    user_id = "guest"
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split("Bearer ", 1)[1].strip()
+        user = get_user_by_token(token)
+        if user:
+            user_id = user["id"]
+
+    analysis = get_user_evaluation_detail(user_id=user_id, evaluation_id=evaluation_id)
+    if not analysis:
+        # Fallback to in-memory active_sessions if exists
+        sess = active_sessions.get(evaluation_id)
+        if sess and sess.get("analysis"):
+            analysis = sess["analysis"]
+
+    if not analysis:
+        raise HTTPException(status_code=404, detail="Evaluation report not found.")
+
+    # Re-cache in active_sessions so copilot chat & custom JD matching work on this restored report
+    active_sessions[evaluation_id] = {"analysis": analysis}
+    active_sessions["latest"] = {"analysis": analysis}
+
+    return {
+        "evaluation_id": evaluation_id,
+        "analysis": analysis
+    }
+
+@app.delete("/api/evaluations/{evaluation_id}")
+async def remove_user_evaluation(
+    evaluation_id: str,
+    authorization: Optional[str] = Header(None)
+):
+    """
+    Delete a specific past evaluation from the user's history in MongoDB.
+    """
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Authentication required.")
+
+    token = authorization.split("Bearer ", 1)[1].strip()
+    user = get_user_by_token(token)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid or expired session token.")
+
+    deleted = delete_user_evaluation(user_id=user["id"], evaluation_id=evaluation_id)
+    return {
+        "success": deleted,
+        "message": "Evaluation record deleted successfully." if deleted else "Evaluation not found or already deleted."
     }
 
 
