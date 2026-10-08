@@ -72,7 +72,6 @@ export const api = {
     formData.append('file', file);
 
     const res = await client.post('/api/resume/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
       onUploadProgress: (progressEvent) => {
         if (onProgress && progressEvent.total) {
           const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -114,7 +113,6 @@ export const api = {
     if (jdFile) formData.append('jd_file', jdFile);
 
     const res = await client.post('/api/evaluate/unified', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
       onUploadProgress: (evt) => {
         if (onUploadProgress && evt.total) {
           onUploadProgress(Math.round((evt.loaded * 100) / evt.total));
@@ -131,9 +129,7 @@ export const api = {
     if (jdText) formData.append('jd_text', jdText);
     if (jdFile) formData.append('jd_file', jdFile);
 
-    const res = await client.post('/api/jd/match', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const res = await client.post('/api/jd/match', formData);
     return res.data;
   },
 

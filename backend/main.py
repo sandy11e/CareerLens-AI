@@ -6,7 +6,8 @@ from datetime import datetime
 from typing import Optional, List, Dict, Any
 from pathlib import Path
 
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Query, Body, Header
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Query, Body, Header, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -48,21 +49,40 @@ app = FastAPI(
 )
 
 # Enable CORS for local Vite development and deployed Vercel frontends
+ALLOWED_ORIGINS = [
+    "https://devlyzer-ai.vercel.app",
+    "https://careerlens-ai.vercel.app",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "*"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "https://careerlens-ai.vercel.app",
-        "*"
-    ],
+    allow_origins=ALLOWED_ORIGINS,
     allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Global unhandled exception on {request.url.path}: {exc}", exc_info=True)
+    origin = request.headers.get("origin", "*")
+    return JSONResponse(
+        status_code=500,
+        content={"detail": f"Backend processing error: {str(exc)}"},
+        headers={
+            "Access-Control-Allow-Origin": origin if origin else "*",
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Methods": "*",
+            "Access-Control-Allow-Headers": "*",
+        }
+    )
 
 UPLOAD_DIR = Path(__file__).resolve().parent / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -329,11 +349,16 @@ async def evaluate_unified_profile(
     current_session_id = session_id or str(uuid.uuid4())
 
     # 1. Process Resume if provided
-    if file:
+    if file and getattr(file, "filename", None):
         file_path = UPLOAD_DIR / f"{current_session_id}.pdf"
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        raw_text, metadata = extract_text_from_pdf(str(file_path))
+        try:
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+            raw_text, metadata = extract_text_from_pdf(str(file_path))
+        except Exception as e:
+            logger.error(f"Failed to extract text from PDF: {e}")
+            raw_text = ""
+            metadata = {"error": str(e)}
     elif session_id and session_id in active_sessions:
         raw_text = active_sessions[session_id].get("raw_text", "")
         metadata = active_sessions[session_id].get("metadata", {})
