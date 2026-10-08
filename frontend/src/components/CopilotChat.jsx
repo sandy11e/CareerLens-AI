@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, User, Loader2, Copy, Check, Mic, MicOff, Volume2, VolumeX, MessageSquare, Bot } from 'lucide-react';
+import { Send, User, Loader2, Copy, Check, Mic, MicOff, Volume2, VolumeX, MessageSquare, Bot, Trash2 } from 'lucide-react';
 import api from '../api';
 
 const QUICK_PROMPTS = [
@@ -68,6 +68,43 @@ export default function CopilotChat({ evaluationId, initialContext }) {
       window.speechSynthesis?.cancel();
     };
   }, []);
+
+  // Load user conversation history from MongoDB on mount
+  useEffect(() => {
+    async function loadHistory() {
+      try {
+        const res = await api.getChatHistory(evaluationId || 'latest');
+        if (res?.history && res.history.length > 0) {
+          const loaded = res.history.map(m => ({
+            role: m.role,
+            content: m.content,
+            timestamp: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''
+          }));
+          setMessages(loaded);
+        }
+      } catch (err) {
+        console.warn('Could not load user chat history from MongoDB:', err);
+      }
+    }
+    loadHistory();
+  }, [evaluationId]);
+
+  const handleClearHistory = async () => {
+    if (window.confirm('Are you sure you want to clear your conversation history?')) {
+      try {
+        await api.clearChatHistory(evaluationId || 'latest');
+        setMessages([
+          {
+            role: 'assistant',
+            content: "Conversation history cleared. How can I help you today with your developer profile, resume, or technical prep?",
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }
+        ]);
+      } catch (err) {
+        console.error('Failed to clear chat history:', err);
+      }
+    }
+  };
 
   const toggleVoiceInput = () => {
     if (!recognitionRef.current) {
@@ -220,6 +257,26 @@ export default function CopilotChat({ evaluationId, initialContext }) {
           <span className="badge badge-blue" style={{ fontSize: '0.65rem' }}>
             Career Focused
           </span>
+          <button
+            onClick={handleClearHistory}
+            style={{
+              background: 'transparent',
+              border: '1px solid var(--border-subtle)',
+              padding: '4px 9px',
+              borderRadius: 6,
+              fontSize: '0.72rem',
+              color: 'var(--text-muted)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
+            title="Clear saved conversation history from MongoDB"
+          >
+            <Trash2 size={12} />
+            <span>Clear Chat</span>
+          </button>
         </div>
       </div>
 

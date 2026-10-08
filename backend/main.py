@@ -13,7 +13,8 @@ from pydantic import BaseModel
 from config import GROQ_API_KEY, GROQ_MODEL, PORT
 from database import (
     connect_db, get_db, save_evaluation, get_evaluations_by_user,
-    create_user, authenticate_user, get_user_by_token
+    create_user, authenticate_user, get_user_by_token,
+    save_chat_message, get_chat_history, clear_chat_history
 )
 from services.groq_service import is_groq_configured
 from services.resume_parser import extract_text_from_pdf
@@ -640,9 +641,12 @@ class ChatMessage(BaseModel):
     history: Optional[List[Dict[str, str]]] = []
 
 @app.post("/api/chat")
-async def copilot_chat(payload: ChatMessage):
+async def copilot_chat(
+    payload: ChatMessage,
+    authorization: Optional[str] = Header(None)
+):
     """
-    Conversational Career Copilot with complete candidate intelligence.
+    Conversational Career Copilot with user-isolated conversation memory in MongoDB.
     """
     msg = payload.message.strip()
     if not msg:
@@ -652,15 +656,85 @@ async def copilot_chat(payload: ChatMessage):
     session_data = active_sessions.get(eval_id) or active_sessions.get("latest") or {}
     context = session_data.get("analysis", {})
 
+    # Extract user identity from auth token
+    user = None
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split("Bearer ", 1)[1].strip()
+        user = get_user_by_token(token)
+
+    # Use authenticated user id or fallback to eval_id
+    user_id = user["id"] if user else (eval_id or "guest")
+
+    # Load stored conversation history for this specific user
+    stored_msgs = get_chat_history(user_id, limit=30)
+    chat_context = []
+    for m in stored_msgs:
+        chat_context.append({
+            "role": m.get("role", "user"),
+            "content": m.get("content", "")
+        })
+
+    # If database history was empty but client passed history, incorporate it
+    if not chat_context and payload.history:
+        chat_context = payload.history
+
     reply = generate_copilot_response(
         candidate_context=context,
         user_message=msg,
-        chat_history=payload.history
+        chat_history=chat_context
     )
+
+    # Save both user prompt and assistant reply in MongoDB under user_id
+    save_chat_message(user_id=user_id, role="user", content=msg, evaluation_id=eval_id)
+    save_chat_message(user_id=user_id, role="assistant", content=reply, evaluation_id=eval_id)
+
+    # Return reply along with updated user-specific history
+    updated_history = get_chat_history(user_id, limit=50)
 
     return {
         "reply": reply,
+        "history": updated_history,
         "timestamp": datetime.utcnow().isoformat()
+    }
+
+@app.get("/api/chat/history")
+async def fetch_chat_history(
+    authorization: Optional[str] = Header(None),
+    evaluation_id: Optional[str] = Query("latest")
+):
+    """
+    Retrieve user-isolated conversation history from MongoDB.
+    """
+    user = None
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split("Bearer ", 1)[1].strip()
+        user = get_user_by_token(token)
+
+    user_id = user["id"] if user else (evaluation_id or "guest")
+    messages = get_chat_history(user_id, limit=50)
+    return {
+        "user_id": user_id,
+        "history": messages
+    }
+
+@app.delete("/api/chat/history")
+async def clear_user_chat_history(
+    authorization: Optional[str] = Header(None),
+    evaluation_id: Optional[str] = Query("latest")
+):
+    """
+    Clear conversation history for the current user in MongoDB.
+    """
+    user = None
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split("Bearer ", 1)[1].strip()
+        user = get_user_by_token(token)
+
+    user_id = user["id"] if user else (evaluation_id or "guest")
+    success = clear_chat_history(user_id)
+    return {
+        "success": success,
+        "message": "Conversation history cleared successfully."
     }
 
 

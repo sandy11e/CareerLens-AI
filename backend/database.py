@@ -14,7 +14,8 @@ db = None
 memory_store = {
     "evaluations": [],
     "resumes": {},
-    "users": {}  # email -> user_dict
+    "users": {},  # email -> user_dict
+    "conversations": {}  # user_id -> list of messages
 }
 
 def connect_db():
@@ -32,6 +33,7 @@ def connect_db():
         # Ensure unique index on email
         try:
             db.users.create_index("email", unique=True)
+            db.conversations.create_index([("user_id", 1), ("timestamp", 1)])
         except Exception:
             pass
         logger.info("Successfully connected to MongoDB.")
@@ -200,3 +202,52 @@ def get_evaluations_by_user(identifier: str):
         rec for rec in memory_store["evaluations"]
         if rec.get("github_username") == identifier or rec.get("candidate_name") == identifier
     ]
+
+# ----------------- Conversation History Persistence ----------------- #
+
+def save_chat_message(user_id: str, role: str, content: str, evaluation_id: str = None):
+    msg = {
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
+        "role": role,
+        "content": content,
+        "evaluation_id": evaluation_id,
+        "timestamp": datetime.utcnow().isoformat()
+    }
+    if db is not None:
+        try:
+            db.conversations.insert_one(msg.copy())
+        except Exception as e:
+            logger.error(f"Error saving chat message to MongoDB: {e}")
+            memory_store.setdefault("conversations", {}).setdefault(user_id, []).append(msg)
+    else:
+        memory_store.setdefault("conversations", {}).setdefault(user_id, []).append(msg)
+    return msg
+
+def get_chat_history(user_id: str, limit: int = 50):
+    if not user_id:
+        return []
+    if db is not None:
+        try:
+            msgs = list(db.conversations.find(
+                {"user_id": user_id},
+                {"_id": 0}
+            ).sort("timestamp", 1).limit(limit))
+            return msgs
+        except Exception as e:
+            logger.error(f"Error reading chat history from MongoDB: {e}")
+    
+    return memory_store.get("conversations", {}).get(user_id, [])[-limit:]
+
+def clear_chat_history(user_id: str):
+    if not user_id:
+        return False
+    if db is not None:
+        try:
+            db.conversations.delete_many({"user_id": user_id})
+        except Exception as e:
+            logger.error(f"Error clearing chat history in MongoDB: {e}")
+    if "conversations" in memory_store and user_id in memory_store["conversations"]:
+        memory_store["conversations"][user_id] = []
+    return True
+

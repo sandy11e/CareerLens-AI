@@ -152,13 +152,23 @@ export const api = {
     return res.data;
   },
 
-  // Copilot Chat
+  // Copilot Chat & Persistent MongoDB History
   async askCopilot(message, evaluationId = 'latest', history = []) {
     const res = await client.post('/api/chat', {
       message,
       evaluation_id: evaluationId,
       history,
     });
+    return res.data;
+  },
+
+  async getChatHistory(evaluationId = 'latest') {
+    const res = await client.get(`/api/chat/history?evaluation_id=${encodeURIComponent(evaluationId)}`);
+    return res.data;
+  },
+
+  async clearChatHistory(evaluationId = 'latest') {
+    const res = await client.delete(`/api/chat/history?evaluation_id=${encodeURIComponent(evaluationId)}`);
     return res.data;
   },
 };
