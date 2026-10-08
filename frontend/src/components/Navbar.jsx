@@ -27,6 +27,19 @@ export default function Navbar({
     { id: 'copilot', label: 'Career Advisor', icon: MessageSquare },
   ];
 
+  const handleScroll = (id) => {
+    if (currentView !== 'landing') {
+      onNavigate('landing');
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        el?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      const el = document.getElementById(id);
+      el?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <header style={{
       position: 'sticky',
@@ -40,14 +53,7 @@ export default function Navbar({
         {/* Brand */}
         <div 
           style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} 
-          onClick={() => {
-            if (hasData) {
-              setActiveTab('overview');
-              onNavigate('app');
-            } else {
-              onNavigate('landing');
-            }
-          }}
+          onClick={() => onNavigate('landing')}
         >
           <div style={{
             width: 34,
@@ -76,7 +82,7 @@ export default function Navbar({
           </div>
         </div>
 
-        {/* Navigation Tabs (visible when analysis data exists) */}
+        {/* Navigation Tabs (when in Application Dashboard) */}
         {hasData && currentView === 'app' && (
           <nav className="nav-scroll-container" style={{
             background: 'var(--bg-subtle)',
@@ -84,6 +90,27 @@ export default function Navbar({
             borderRadius: 10,
             border: '1px solid var(--border-subtle)'
           }}>
+            <button
+              onClick={() => onNavigate('landing')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                padding: '6px 10px',
+                borderRadius: 7,
+                border: '1px solid transparent',
+                background: 'transparent',
+                color: 'var(--text-muted)',
+                fontWeight: 600,
+                fontSize: '0.78rem',
+                cursor: 'pointer'
+              }}
+              title="Return to Home Landing"
+            >
+              <Home size={14} />
+              <span>Home</span>
+            </button>
+
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -116,7 +143,7 @@ export default function Navbar({
           </nav>
         )}
 
-        {/* Simple navigation when on Landing or pre-evaluation */}
+        {/* Navigation when on Landing Page or Pre-Evaluation */}
         {(!hasData || currentView !== 'app') && (
           <nav className="hide-on-mobile" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <button
@@ -124,9 +151,9 @@ export default function Navbar({
               style={{
                 background: currentView === 'landing' ? 'var(--bg-subtle)' : 'transparent',
                 border: 'none',
-                padding: '7px 14px',
+                padding: '7px 12px',
                 borderRadius: 8,
-                fontSize: '0.84rem',
+                fontSize: '0.82rem',
                 fontWeight: currentView === 'landing' ? 700 : 500,
                 color: currentView === 'landing' ? 'var(--text-main)' : 'var(--text-secondary)',
                 cursor: 'pointer'
@@ -135,26 +162,77 @@ export default function Navbar({
               Home
             </button>
             <button
-              onClick={() => onNavigate('app')}
+              onClick={() => handleScroll('features')}
               style={{
-                background: currentView === 'app' ? 'var(--bg-subtle)' : 'transparent',
+                background: 'transparent',
                 border: 'none',
-                padding: '7px 14px',
+                padding: '7px 12px',
                 borderRadius: 8,
-                fontSize: '0.84rem',
-                fontWeight: currentView === 'app' ? 700 : 500,
-                color: currentView === 'app' ? 'var(--text-main)' : 'var(--text-secondary)',
+                fontSize: '0.82rem',
+                fontWeight: 500,
+                color: 'var(--text-secondary)',
                 cursor: 'pointer'
               }}
             >
-              Evaluate Profile
+              Features
             </button>
+            <button
+              onClick={() => handleScroll('how-it-works')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                padding: '7px 12px',
+                borderRadius: 8,
+                fontSize: '0.82rem',
+                fontWeight: 500,
+                color: 'var(--text-secondary)',
+                cursor: 'pointer'
+              }}
+            >
+              How It Works
+            </button>
+            <button
+              onClick={() => handleScroll('evaluator-portal')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                padding: '7px 12px',
+                borderRadius: 8,
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                color: 'var(--primary)',
+                cursor: 'pointer'
+              }}
+            >
+              Audit Profile
+            </button>
+            {hasData && (
+              <button
+                onClick={() => onNavigate('app')}
+                style={{
+                  background: 'rgba(37, 99, 235, 0.1)',
+                  border: '1px solid rgba(37, 99, 235, 0.25)',
+                  padding: '5px 12px',
+                  borderRadius: 8,
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  color: 'var(--primary)',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5
+                }}
+              >
+                <Layers size={13} />
+                <span>Active Dashboard</span>
+              </button>
+            )}
           </nav>
         )}
 
         {/* Right Status & Auth Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {/* New Audit button if evaluated */}
+          {/* New Audit button if in app dashboard */}
           {hasData && currentView === 'app' && (
             <button
               onClick={onReset}
@@ -186,7 +264,7 @@ export default function Navbar({
               background: groqStatus?.groq_active ? 'var(--emerald)' : 'var(--amber)'
             }} />
             <span className="hide-on-mobile">
-              {groqStatus?.groq_active ? 'Groq AI Active' : 'Local Fallback'}
+              {groqStatus?.groq_active ? 'Groq Active' : 'Fallback'}
             </span>
           </div>
 

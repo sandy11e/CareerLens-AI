@@ -1,12 +1,25 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { 
   ArrowRight, ShieldCheck, Code2, FileText, Briefcase, 
   Sparkles, CheckCircle2, ChevronRight, BarChart3, Award,
-  Terminal, Zap, Compass, Users, Lock, Star
+  Terminal, Zap, Compass, Users, Lock, Star, ExternalLink, Check
 } from 'lucide-react';
 import { GithubIcon, LeetCodeIcon } from './Icons';
+import HeroUpload from './HeroUpload';
 
-export default function LandingPage({ onStartAudit, onOpenAuth }) {
+export default function LandingPage({ 
+  onAnalyze, 
+  isLoading, 
+  onOpenAuth, 
+  hasData, 
+  onViewDashboard 
+}) {
+  const evaluatorRef = useRef(null);
+
+  const scrollToEvaluator = () => {
+    evaluatorRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const features = [
     {
       icon: FileText,
@@ -66,10 +79,57 @@ export default function LandingPage({ onStartAudit, onOpenAuth }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 64, paddingBottom: 60 }}>
+      {/* Active Evaluation Banner if hasData */}
+      {hasData && (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(16, 185, 129, 0.08) 100%)',
+          border: '1px solid rgba(37, 99, 235, 0.25)',
+          borderRadius: 14,
+          padding: '16px 24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 12,
+          marginTop: 12
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{
+              width: 38,
+              height: 38,
+              borderRadius: 10,
+              background: 'rgba(16, 185, 129, 0.15)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--emerald)'
+            }}>
+              <CheckCircle2 size={20} />
+            </div>
+            <div>
+              <div style={{ fontWeight: 800, fontSize: '0.98rem', color: 'var(--text-main)' }}>
+                Active Evaluation Report Loaded
+              </div>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                Your 360° candidate report, ATS breakdown, code verification, and custom JD matches are ready.
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={onViewDashboard}
+            className="btn-primary"
+            style={{ padding: '9px 20px', fontSize: '0.86rem' }}
+          >
+            <span>View Results Dashboard</span>
+            <ArrowRight size={14} />
+          </button>
+        </div>
+      )}
+
       {/* Hero Section */}
       <section style={{
         position: 'relative',
-        padding: '56px 24px 32px 24px',
+        padding: '48px 24px 24px 24px',
         textAlign: 'center',
         display: 'flex',
         flexDirection: 'column',
@@ -155,7 +215,7 @@ export default function LandingPage({ onStartAudit, onOpenAuth }) {
           marginBottom: 48
         }}>
           <button
-            onClick={onStartAudit}
+            onClick={scrollToEvaluator}
             className="btn-primary"
             style={{
               padding: '14px 32px',
@@ -177,7 +237,7 @@ export default function LandingPage({ onStartAudit, onOpenAuth }) {
               fontWeight: 600
             }}
           >
-            <span>Create Account</span>
+            <span>Create Free Account</span>
           </button>
         </div>
 
@@ -213,7 +273,7 @@ export default function LandingPage({ onStartAudit, onOpenAuth }) {
           zIndex: 1,
           width: '100%',
           maxWidth: 1040,
-          marginTop: 56,
+          marginTop: 48,
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))',
           gap: 18
@@ -276,8 +336,36 @@ export default function LandingPage({ onStartAudit, onOpenAuth }) {
         </div>
       </section>
 
+      {/* CORE INTEGRATION: EMBEDDED EVALUATOR PORTAL */}
+      <section 
+        id="evaluator-portal" 
+        ref={evaluatorRef} 
+        style={{ 
+          maxWidth: 820, 
+          margin: '0 auto', 
+          width: '100%', 
+          padding: '0 20px',
+          scrollMarginTop: 90
+        }}
+      >
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <span className="badge badge-blue" style={{ fontSize: '0.8rem', marginBottom: 10 }}>
+            Unified Evaluation Portal
+          </span>
+          <h2 className="font-display" style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
+            Audit Your Profile Now
+          </h2>
+          <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: 4 }}>
+            Upload your resume and enter your developer handles to generate your holistic 360° evaluation.
+          </p>
+        </div>
+
+        {/* Embedded Upload Component */}
+        <HeroUpload onAnalyze={onAnalyze} isLoading={isLoading} />
+      </section>
+
       {/* Core Capabilities Grid */}
-      <section style={{ maxWidth: 1120, margin: '0 auto', width: '100%', padding: '0 20px' }}>
+      <section id="features" style={{ maxWidth: 1120, margin: '0 auto', width: '100%', padding: '0 20px', scrollMarginTop: 90 }}>
         <div style={{ textAlign: 'center', marginBottom: 44 }}>
           <span className="badge badge-slate" style={{ fontSize: '0.78rem', marginBottom: 12 }}>
             Complete 360° Developer Intelligence
@@ -337,11 +425,12 @@ export default function LandingPage({ onStartAudit, onOpenAuth }) {
       </section>
 
       {/* How It Works (3 Steps) */}
-      <section style={{
+      <section id="how-it-works" style={{
         background: 'var(--bg-subtle)',
         borderTop: '1px solid var(--border-subtle)',
         borderBottom: '1px solid var(--border-subtle)',
-        padding: '64px 20px'
+        padding: '64px 20px',
+        scrollMarginTop: 90
       }}>
         <div style={{ maxWidth: 1040, margin: '0 auto', textAlign: 'center' }}>
           <span className="badge badge-blue" style={{ fontSize: '0.78rem', marginBottom: 12 }}>
@@ -437,7 +526,7 @@ export default function LandingPage({ onStartAudit, onOpenAuth }) {
 
           <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center' }}>
             <button
-              onClick={onStartAudit}
+              onClick={scrollToEvaluator}
               className="btn-primary"
               style={{
                 background: '#ffffff',
@@ -447,7 +536,7 @@ export default function LandingPage({ onStartAudit, onOpenAuth }) {
                 fontWeight: 700
               }}
             >
-              <span>Launch Free Evaluation</span>
+              <span>Audit Profile Now</span>
               <ArrowRight size={17} color="var(--text-main)" />
             </button>
 

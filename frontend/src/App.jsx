@@ -168,11 +168,26 @@ export default function App() {
       {/* Main Content Area */}
       <main className="app-main-container">
         {/* VIEW 1: LANDING PAGE */}
-        {currentView === 'landing' && !analysisData && !isLoading && (
-          <LandingPage
-            onStartAudit={handleStartAudit}
-            onOpenAuth={handleOpenAuth}
-          />
+        {currentView === 'landing' && (
+          <>
+            {isLoading && (
+              <div style={{ marginBottom: 24 }}>
+                <LoadingProgress uploadProgress={uploadProgress} />
+              </div>
+            )}
+            {!isLoading && error && (
+              <div style={{ marginBottom: 24 }}>
+                <ErrorAlert error={error} onRetry={() => lastParams && handleAnalyze(lastParams)} />
+              </div>
+            )}
+            <LandingPage
+              onAnalyze={handleAnalyze}
+              isLoading={isLoading}
+              onOpenAuth={handleOpenAuth}
+              hasData={!!analysisData}
+              onViewDashboard={() => setCurrentView('app')}
+            />
+          </>
         )}
 
         {/* VIEW 2: AUTHENTICATION PAGE (LOGIN / REGISTER) */}
