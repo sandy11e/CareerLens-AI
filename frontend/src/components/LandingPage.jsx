@@ -102,31 +102,15 @@ export default function LandingPage({
         alignItems: 'center',
         overflow: 'hidden'
       }}>
-        {/* Ambient orbs */}
-        <div className="ambient-orb" style={{
-          width: 500, height: 500, top: -120, left: '20%',
-          background: 'radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%)',
-        }} />
-        <div className="ambient-orb" style={{
-          width: 400, height: 400, top: -60, right: '15%',
-          background: 'radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%)',
-          animationDelay: '3s',
-        }} />
-        <div className="ambient-orb" style={{
-          width: 300, height: 300, bottom: -80, left: '10%',
-          background: 'radial-gradient(circle, rgba(14, 165, 233, 0.08) 0%, transparent 70%)',
-          animationDelay: '1.5s',
-        }} />
-
         {/* Announcement pill */}
         <div className="animate-fade-in-down" style={{
           position: 'relative', zIndex: 1,
           display: 'inline-flex', alignItems: 'center', gap: 8,
-          background: 'rgba(99, 102, 241, 0.08)',
-          border: '1px solid rgba(99, 102, 241, 0.2)',
+          background: 'var(--primary-subtle)',
+          border: '1px solid var(--border-subtle)',
           padding: '6px 16px', borderRadius: 24,
           fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 600,
-          marginBottom: 24, backdropFilter: 'blur(8px)',
+          marginBottom: 24,
           maxWidth: '100%',
           textAlign: 'center',
           flexWrap: 'wrap',
@@ -159,7 +143,7 @@ export default function LandingPage({
           color: 'var(--text-muted)', maxWidth: 640,
           lineHeight: 1.6, marginBottom: 36,
         }}>
-          Traditional ATS scanners only match keywords. CareerLens AI audits your resume compliance,
+          Traditional ATS scanners only match keywords. Devlyzer AI audits your resume compliance,
           validates real GitHub code, evaluates LeetCode performance, and matches any custom Job Description.
         </p>
 
@@ -321,7 +305,7 @@ export default function LandingPage({
             Secure Workflow
           </span>
           <h2 className="font-display" style={{ fontSize: 'clamp(1.6rem, 4vw, 2.2rem)', fontWeight: 800, color: 'var(--text-main)', marginBottom: 40, letterSpacing: '-0.02em' }}>
-            How CareerLens Evaluates Your Profile
+            How Devlyzer AI Evaluates Your Profile
           </h2>
 
           <div style={{
@@ -383,7 +367,7 @@ export default function LandingPage({
 
             <div className="animate-slide-right" style={{ background: 'linear-gradient(135deg, #ecfdf5, #d1fae5)', border: '1px solid #a7f3d0', borderRadius: 14, padding: '20px 18px' }}>
               <div style={{ fontWeight: 700, color: 'var(--emerald)', fontSize: '0.9rem', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: '1.1rem' }}>✓</span> CareerLens Multi-Signal Engine
+                <span style={{ fontSize: '1.1rem' }}>✓</span> Devlyzer Multi-Signal Engine
               </div>
               <ul style={{ paddingLeft: 16, fontSize: '0.82rem', color: '#166534', display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <li>Multi-dimensional parsing: layout, metrics, certs</li>

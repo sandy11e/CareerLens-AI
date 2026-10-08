@@ -37,7 +37,7 @@ export default function AtsBenchmarkBarChart({ scores = {} }) {
       {
         label: 'Candidate Score',
         data: metrics.map(m => m.val),
-        backgroundColor: metrics.map(m => m.val >= 75 ? (isDark ? '#34d399' : '#059669') : m.val >= 60 ? (isDark ? '#818cf8' : '#2563eb') : (isDark ? '#fbbf24' : '#d97706')),
+        backgroundColor: metrics.map(m => m.val >= 75 ? (isDark ? '#34d399' : '#059669') : m.val >= 60 ? (isDark ? '#fb923c' : '#ea580c') : (isDark ? '#fbbf24' : '#d97706')),
         borderRadius: 4,
         barThickness: 12,
       },

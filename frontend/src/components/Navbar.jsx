@@ -2,7 +2,8 @@ import React from 'react';
 import { 
   Layers, FileText, Code2, ShieldCheck, Briefcase, 
   MessageSquare, Compass, RotateCcw, User, LogOut, 
-  Home, History, Menu, X, Sparkles, Sun, Moon
+  Home, History, Menu, X, Sparkles, Sun, Moon,
+  PanelLeftClose, PanelLeft, ChevronRight
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -18,7 +19,9 @@ export default function Navbar({
   onReset, 
   groqStatus,
   theme,
-  toggleTheme
+  toggleTheme,
+  sidebarOpen,
+  onToggleSidebar
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
@@ -32,6 +35,8 @@ export default function Navbar({
     { id: 'copilot', label: 'AI Advisor', icon: MessageSquare },
   ];
 
+  const activeTabObj = tabs.find(t => t.id === activeTab);
+
   return (
     <header style={{
       position: 'sticky',
@@ -44,107 +49,80 @@ export default function Navbar({
       transition: 'all 0.3s ease',
     }}>
       <div className="app-header-inner">
-        {/* Brand */}
-        <div 
-          style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} 
-          onClick={() => onNavigate('landing')}
-        >
-          <div style={{
-            width: 36,
-            height: 36,
-            borderRadius: 10,
-            background: 'var(--gradient-accent)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#ffffff',
-            boxShadow: '0 2px 8px var(--primary-glow)',
-            transition: 'transform 0.3s ease',
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.transform = 'rotate(-8deg) scale(1.05)'}
-          onMouseLeave={(e) => e.currentTarget.style.transform = 'rotate(0) scale(1)'}
+        {/* Left Side: Toggle + Brand + Breadcrumb */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {hasData && currentView === 'app' && onToggleSidebar && (
+            <button
+              onClick={onToggleSidebar}
+              className="btn-ghost"
+              style={{ padding: 6 }}
+              title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+            >
+              {sidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeft size={18} />}
+            </button>
+          )}
+
+          <div 
+            style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} 
+            onClick={() => onNavigate('landing')}
           >
-            <Sparkles size={19} />
+            <div style={{
+              width: 32,
+              height: 32,
+              borderRadius: 8,
+              background: 'var(--primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ffffff',
+              flexShrink: 0
+            }}>
+              <Sparkles size={17} />
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span className="font-display" style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.03em' }}>
+                  Devlyzer AI
+                </span>
+                <span style={{
+                  fontSize: '0.62rem',
+                  fontWeight: 700,
+                  padding: '1px 6px',
+                  borderRadius: 4,
+                  background: 'var(--primary-subtle)',
+                  color: 'var(--primary)',
+                  border: '1px solid var(--border-subtle)'
+                }}>
+                  PRO
+                </span>
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span className="font-display" style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.03em' }}>
-                CareerLens
-              </span>
-              <span className="badge badge-gradient" style={{ fontSize: '0.62rem', padding: '1px 8px' }}>
-                AI
+
+          {/* Breadcrumb in Command Center mode */}
+          {hasData && currentView === 'app' && (
+            <div className="hide-on-mobile" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: '0.78rem',
+              color: 'var(--text-muted)',
+              marginLeft: 8,
+              paddingLeft: 12,
+              borderLeft: '1px solid var(--border-subtle)'
+            }}>
+              <span>Command Center</span>
+              <ChevronRight size={13} style={{ opacity: 0.4 }} />
+              <span style={{ color: 'var(--text-main)', fontWeight: 700 }}>
+                {activeTabObj?.label || 'Dashboard'}
               </span>
             </div>
-            <div style={{ fontSize: '0.68rem', color: 'var(--text-dim)', letterSpacing: '0.01em' }} className="hide-on-mobile">
-              Candidate Intelligence Platform
-            </div>
-          </div>
+          )}
         </div>
 
-        {/* Dashboard Tabs (when in Application Dashboard with data) */}
-        {hasData && currentView === 'app' && (
-          <nav className="nav-scroll-container hide-on-mobile" style={{
-            background: 'var(--bg-subtle)',
-            padding: '3px',
-            borderRadius: 12,
-            border: '1px solid var(--border-subtle)'
-          }}>
-            <button
-              onClick={() => onNavigate('landing')}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                padding: '5px 10px',
-                borderRadius: 9,
-                border: 'none',
-                background: 'transparent',
-                color: 'var(--text-dim)',
-                fontWeight: 500,
-                fontSize: '0.76rem',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              <Home size={13} />
-            </button>
-
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 5,
-                    padding: '5px 12px',
-                    borderRadius: 9,
-                    border: 'none',
-                    background: isActive ? '#ffffff' : 'transparent',
-                    color: isActive ? 'var(--text-main)' : 'var(--text-muted)',
-                    fontWeight: isActive ? 600 : 500,
-                    fontSize: '0.78rem',
-                    cursor: 'pointer',
-                    boxShadow: isActive ? 'var(--shadow-sm)' : 'none',
-                    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                    whiteSpace: 'nowrap',
-                    position: 'relative',
-                  }}
-                >
-                  <Icon size={14} color={isActive ? 'var(--primary)' : 'currentColor'} />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </nav>
-        )}
-
-        {/* Landing Page Nav */}
+        {/* Landing Page Nav (when not in dashboard) */}
         {(!hasData || currentView !== 'app') && (
-          <nav className="hide-on-mobile" style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <nav className="hide-on-mobile" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             {[
               { label: 'Home', view: 'landing' },
               { label: 'Features', scroll: 'features' },
@@ -185,7 +163,7 @@ export default function Navbar({
                 }}
               >
                 <Layers size={14} />
-                <span>{hasData ? 'Dashboard' : 'Evaluator'}</span>
+                <span>{hasData ? 'Command Center' : 'Evaluator'}</span>
               </button>
             )}
           </nav>

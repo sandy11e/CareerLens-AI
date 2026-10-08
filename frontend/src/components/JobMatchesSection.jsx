@@ -275,7 +275,7 @@ export default function JobMatchesSection({ data, onJdMatchUpdate, onRoadmapUpda
 
           {/* JD Input Drawer / Form */}
           {(!customJd || showInputDrawer) && (
-            <div className="card-solid" style={{ padding: '24px 28px', border: '1.5px solid var(--primary-border, #bfdbfe)' }}>
+            <div className="card-solid" style={{ padding: '24px 28px', border: '1px solid var(--border-medium)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1140,7 +1140,7 @@ export default function JobMatchesSection({ data, onJdMatchUpdate, onRoadmapUpda
 
                       <div style={{
                         background: isHighFit ? 'var(--emerald-subtle)' : isMidFit ? 'var(--primary-subtle)' : 'var(--amber-subtle)',
-                        border: `1px solid ${isHighFit ? 'var(--emerald-border)' : isMidFit ? '#bfdbfe' : 'var(--amber-border)'}`,
+                        border: `1px solid ${isHighFit ? 'var(--emerald-border)' : isMidFit ? 'var(--border-subtle)' : 'var(--amber-border)'}`,
                         borderRadius: 8,
                         padding: '4px 10px',
                         textAlign: 'center'

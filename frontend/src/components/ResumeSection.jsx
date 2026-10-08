@@ -53,10 +53,10 @@ function getRecMeta(recText) {
     return { level: 'High Impact', color: 'var(--rose)', bg: 'var(--rose-subtle)', border: 'var(--rose-border)', category: 'Impact & Metrics' };
   }
   if (t.includes('keyword') || t.includes('skill') || t.includes('match') || t.includes('term')) {
-    return { level: 'ATS Keywords', color: 'var(--primary)', bg: 'var(--primary-subtle)', border: '#c7d2fe', category: 'Keyword Density' };
+    return { level: 'ATS Keywords', color: 'var(--primary)', bg: 'var(--primary-subtle)', border: 'var(--primary-glow)', category: 'Keyword Density' };
   }
   if (t.includes('format') || t.includes('bullet') || t.includes('section') || t.includes('layout')) {
-    return { level: 'ATS Parsing', color: 'var(--sky)', bg: 'var(--sky-subtle)', border: '#bae6fd', category: 'Structure & Format' };
+    return { level: 'ATS Parsing', color: 'var(--primary)', bg: 'var(--primary-subtle)', border: 'var(--border-subtle)', category: 'Structure & Format' };
   }
   return { level: 'Recommended', color: 'var(--amber)', bg: 'var(--amber-subtle)', border: 'var(--amber-border)', category: 'Best Practice' };
 }
@@ -176,7 +176,7 @@ export default function ResumeSection({ data }) {
                 <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{metric.label}</span>
                 <span className="font-display" style={{ fontSize: '0.9rem', fontWeight: 700, color: metric.color }}>{metric.score}%</span>
               </div>
-              <div style={{ height: 6, background: '#ffffff', borderRadius: 3, overflow: 'hidden' }}>
+              <div style={{ height: 6, background: 'var(--border-subtle)', borderRadius: 3, overflow: 'hidden' }}>
                 <div style={{
                   width: `${metric.score}%`,
                   height: '100%',
@@ -274,7 +274,7 @@ export default function ResumeSection({ data }) {
                       gap: 10,
                       padding: '10px 14px',
                       borderRadius: 8,
-                      background: isChecked ? 'var(--bg-subtle)' : '#ffffff',
+                      background: isChecked ? 'var(--bg-subtle)' : 'var(--card-bg)',
                       border: `1px solid ${isChecked ? 'var(--border-subtle)' : meta.border}`,
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
@@ -408,7 +408,7 @@ export default function ResumeSection({ data }) {
             <span
               key={idx}
               style={{
-                background: '#ffffff',
+                background: 'var(--card-bg)',
                 border: '1px solid var(--border-medium)',
                 color: 'var(--text-main)',
                 padding: '4px 12px',
@@ -463,7 +463,7 @@ export default function ResumeSection({ data }) {
                   </div>
 
                   <div style={{
-                    background: '#ffffff',
+                    background: 'var(--card-bg)',
                     border: '1px solid var(--border-medium)',
                     borderRadius: 12,
                     padding: '18px 20px',
@@ -478,7 +478,7 @@ export default function ResumeSection({ data }) {
                           width: 40,
                           height: 40,
                           borderRadius: 10,
-                          background: 'linear-gradient(135deg, var(--primary) 0%, var(--indigo) 100%)',
+                          background: 'var(--primary)',
                           color: '#ffffff',
                           display: 'flex',
                           alignItems: 'center',
@@ -548,7 +548,7 @@ export default function ResumeSection({ data }) {
                           Tech:
                         </span>
                         {exp.technologies_used.map((t, tIdx) => (
-                          <span key={tIdx} style={{ fontSize: '0.7rem', background: '#ffffff', color: 'var(--text-secondary)', border: '1px solid var(--border-medium)', padding: '2px 8px', borderRadius: 4, fontWeight: 500 }}>
+                          <span key={tIdx} style={{ fontSize: '0.7rem', background: 'var(--bg-subtle)', color: 'var(--text-secondary)', border: '1px solid var(--border-medium)', padding: '2px 8px', borderRadius: 4, fontWeight: 500 }}>
                             {t}
                           </span>
                         ))}
@@ -597,7 +597,7 @@ export default function ResumeSection({ data }) {
                   {proj.technologies && proj.technologies.length > 0 && (
                     <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 6 }}>
                       {proj.technologies.map((tech, tIdx) => (
-                        <span key={tIdx} style={{ fontSize: '0.7rem', background: '#ffffff', color: 'var(--emerald)', border: '1px solid var(--emerald-border)', padding: '1px 6px', borderRadius: 4 }}>
+                        <span key={tIdx} style={{ fontSize: '0.7rem', background: 'var(--emerald-subtle)', color: 'var(--emerald)', border: '1px solid var(--emerald-border)', padding: '1px 6px', borderRadius: 4 }}>
                           {tech}
                         </span>
                       ))}
@@ -728,7 +728,7 @@ export default function ResumeSection({ data }) {
               width: 36,
               height: 36,
               borderRadius: 10,
-              background: '#f1f5f9',
+              background: 'var(--bg-subtle)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

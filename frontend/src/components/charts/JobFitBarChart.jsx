@@ -30,7 +30,7 @@ export default function JobFitBarChart({ jobs = [] }) {
         data: topJobs.map(j => Math.round(j.fit_score || 0)),
         backgroundColor: topJobs.map(j => {
           const score = j.fit_score || 0;
-          return score >= 75 ? '#059669' : score >= 50 ? '#2563eb' : '#d97706';
+          return score >= 75 ? '#059669' : score >= 50 ? '#ea580c' : '#d97706';
         }),
         borderRadius: 4,
         barThickness: 14

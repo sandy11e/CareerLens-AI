@@ -10,7 +10,7 @@ import { Doughnut } from 'react-chartjs-2';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const PALETTE = [
-  '#2563eb', '#7c3aed', '#059669', '#d97706', '#db2777', '#0284c7', '#0d9488', '#ea580c'
+  '#ea580c', '#f97316', '#059669', '#d97706', '#b45309', '#c2410c', '#0d9488', '#78350f'
 ];
 
 export default function LanguageDonutChart({ repos = [] }) {

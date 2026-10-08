@@ -1,6 +1,6 @@
-# 🌟 CareerLens AI — 360° Career Intelligence & ATS Proof-of-Work Platform
+# 🌟 Devlyzer AI — 360° Career Intelligence & ATS Proof-of-Work Platform
 
-**CareerLens AI** unifies **Resume Intelligence (resume-ai)** with **Live Developer Signal Verification (Devlyzer-AI)** into a single, high-performance career assessment and job-matching platform.
+**Devlyzer AI** unifies **Resume Intelligence** with **Live Developer Signal Verification** into a single, high-performance career assessment and job-matching platform.
 
 ---
 

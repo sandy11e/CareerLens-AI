@@ -6,11 +6,11 @@ export default function ScoreGauge({ score = 0, size = 110, strokeWidth = 8, lab
   const clampedScore = Math.min(Math.max(Number(score) || 0, 0), 100);
   const strokeDashoffset = circumference - (clampedScore / 100) * circumference;
 
-  let color = '#2563eb';
+  let color = '#ea580c';
   if (clampedScore >= 80) {
     color = '#059669';
   } else if (clampedScore >= 60) {
-    color = '#2563eb';
+    color = '#ea580c';
   } else if (clampedScore >= 45) {
     color = '#d97706';
   } else {

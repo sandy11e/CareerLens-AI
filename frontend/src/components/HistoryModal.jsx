@@ -137,7 +137,7 @@ export default function HistoryModal({ isOpen, onClose, onLoadEvaluation, curren
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: 'linear-gradient(to right, #f8fafc, #ffffff)'
+          background: 'var(--card-bg)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{
@@ -145,7 +145,7 @@ export default function HistoryModal({ isOpen, onClose, onLoadEvaluation, curren
               height: 40,
               borderRadius: 10,
               background: 'var(--primary-subtle)',
-              border: '1px solid #bfdbfe',
+              border: '1px solid var(--border-subtle)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -158,7 +158,7 @@ export default function HistoryModal({ isOpen, onClose, onLoadEvaluation, curren
                 <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
                   Candidate Audit History
                 </h2>
-                <span className="badge badge-blue" style={{ fontSize: '0.72rem' }}>
+                <span className="badge badge-primary" style={{ fontSize: '0.72rem' }}>
                   {evaluations.length} {evaluations.length === 1 ? 'Audit' : 'Audits'} Saved
                 </span>
               </div>
@@ -206,7 +206,7 @@ export default function HistoryModal({ isOpen, onClose, onLoadEvaluation, curren
         <div style={{
           padding: '12px 24px',
           borderBottom: '1px solid var(--border-subtle)',
-          backgroundColor: '#fafbfc',
+          backgroundColor: 'var(--bg-subtle)',
           display: 'flex',
           alignItems: 'center',
           gap: 12
@@ -225,7 +225,8 @@ export default function HistoryModal({ isOpen, onClose, onLoadEvaluation, curren
                 border: '1px solid var(--border-subtle)',
                 fontSize: '0.85rem',
                 outline: 'none',
-                background: '#ffffff'
+                background: 'var(--card-bg)',
+                color: 'var(--text-main)'
               }}
             />
           </div>
@@ -281,7 +282,7 @@ export default function HistoryModal({ isOpen, onClose, onLoadEvaluation, curren
               padding: '50px 20px',
               border: '1px dashed var(--border-medium)',
               borderRadius: 12,
-              background: '#fafbfc'
+              background: 'var(--bg-subtle)'
             }}>
               <div style={{
                 width: 52,
@@ -334,7 +335,7 @@ export default function HistoryModal({ isOpen, onClose, onLoadEvaluation, curren
                     cursor: 'pointer',
                     position: 'relative',
                     borderColor: isSelected ? 'var(--primary)' : 'var(--border-subtle)',
-                    background: isSelected ? 'var(--primary-subtle)' : '#ffffff',
+                    background: isSelected ? 'var(--primary-subtle)' : 'var(--card-bg)',
                     transition: 'all 0.18s ease',
                     opacity: isDeletingThis ? 0.5 : 1
                   }}
@@ -353,7 +354,7 @@ export default function HistoryModal({ isOpen, onClose, onLoadEvaluation, curren
                           {item.candidate_name || 'Candidate Evaluation'}
                         </span>
                         {isSelected && (
-                          <span className="badge badge-blue" style={{ fontSize: '0.68rem' }}>
+                          <span className="badge badge-primary" style={{ fontSize: '0.68rem' }}>
                             Currently Active
                           </span>
                         )}

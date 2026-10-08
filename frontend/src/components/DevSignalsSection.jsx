@@ -103,7 +103,7 @@ export default function DevSignalsSection({ data }) {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ width: 36, height: 36, borderRadius: 8, background: 'var(--bg-subtle)', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <GithubIcon size={20} color="#0f172a" />
+                <GithubIcon size={20} color="var(--text-main)" />
               </div>
               <div>
                 <h4 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)' }}>
@@ -205,7 +205,7 @@ export default function DevSignalsSection({ data }) {
                             width: 26,
                             height: 26,
                             borderRadius: 6,
-                            background: '#ffffff',
+                            background: 'var(--card-bg)',
                             border: '1px solid var(--border-subtle)',
                             display: 'flex',
                             alignItems: 'center',

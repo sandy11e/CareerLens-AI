@@ -43,7 +43,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("careerlens.main")
 
 app = FastAPI(
-    title="CareerLens AI - Unified Talent Intelligence API",
+    title="Devlyzer AI - Unified Talent Intelligence API",
     description="360° Developer Profile Evaluation, High-Precision ATS Resume Extraction, Semantic Job Matching & AI Career Copilot.",
     version="2.0.0"
 )
@@ -106,7 +106,7 @@ def _keep_alive_ping_worker():
 
 @app.on_event("startup")
 def startup_event():
-    logger.info("Initializing CareerLens AI backend...")
+    logger.info("Initializing Devlyzer AI backend...")
     connect_db()
     import threading
     threading.Thread(target=_keep_alive_ping_worker, daemon=True).start()
@@ -114,7 +114,7 @@ def startup_event():
 @app.get("/")
 def root():
     return {
-        "service": "CareerLens AI",
+        "service": "Devlyzer AI",
         "status": "operational",
         "version": "2.0.0",
         "groq_configured": is_groq_configured(),

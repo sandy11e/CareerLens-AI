@@ -141,7 +141,7 @@ export default function AuthPage({ initialMode = 'login', onAuthSuccess, onBackH
           <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: 4 }}>
             {mode === 'login' 
               ? 'Sign in to access your saved audits and career metrics' 
-              : 'Join CareerLens to save profile evaluations and track progress'}
+              : 'Join Devlyzer AI to save profile evaluations and track progress'}
           </p>
         </div>
 

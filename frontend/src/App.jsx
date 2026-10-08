@@ -14,6 +14,7 @@ import JobMatchesSection from './components/JobMatchesSection';
 import RoadmapSection from './components/RoadmapSection';
 import CopilotChat from './components/CopilotChat';
 import HistoryModal from './components/HistoryModal';
+import CommandSidebar from './components/CommandSidebar';
 import api from './api';
 
 export default function App() {
@@ -29,11 +30,12 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('overview');
   const [groqStatus, setGroqStatus] = useState({ groq_active: false });
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [commandSidebarOpen, setCommandSidebarOpen] = useState(() => typeof window !== 'undefined' ? window.innerWidth > 960 : true);
 
   // Theme Management (Persisted in localStorage with system preference fallback)
   const [theme, setTheme] = useState(() => {
     try {
-      const saved = localStorage.getItem('careerlens_theme');
+      const saved = localStorage.getItem('devlyzer_theme') || localStorage.getItem('careerlens_theme');
       if (saved) return saved;
       return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     } catch {
@@ -44,7 +46,7 @@ export default function App() {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     try {
-      localStorage.setItem('careerlens_theme', theme);
+      localStorage.setItem('devlyzer_theme', theme);
     } catch {}
   }, [theme]);
 
@@ -231,6 +233,8 @@ export default function App() {
         groqStatus={groqStatus}
         theme={theme}
         toggleTheme={toggleTheme}
+        sidebarOpen={commandSidebarOpen}
+        onToggleSidebar={() => setCommandSidebarOpen(prev => !prev)}
       />
 
       {/* Main Content Area */}
@@ -273,35 +277,52 @@ export default function App() {
               <HeroUpload onAnalyze={handleAnalyze} isLoading={isLoading} />
             )}
 
-            {/* Evaluated Dashboard View */}
+            {/* Evaluated Dashboard View: Unified Interactive Command Center */}
             {!isLoading && !error && analysisData && (
-              <div>
-                {activeTab === 'overview' && (
-                  <OverviewSection data={analysisData} setActiveTab={setActiveTab} />
-                )}
-                {activeTab === 'roadmap' && (
-                  <RoadmapSection data={analysisData} onRoadmapUpdate={handleRoadmapUpdate} />
-                )}
-                {activeTab === 'resume' && (
-                  <ResumeSection data={analysisData} />
-                )}
-                {activeTab === 'dev' && (
-                  <DevSignalsSection data={analysisData} />
-                )}
-                {activeTab === 'verification' && (
-                  <CrossVerificationSection data={analysisData} />
-                )}
-                {activeTab === 'jobs' && (
-                  <JobMatchesSection
-                    data={analysisData}
-                    onJdMatchUpdate={handleCustomJdUpdate}
-                    onRoadmapUpdate={handleRoadmapUpdate}
-                    setActiveTab={setActiveTab}
-                  />
-                )}
-                {activeTab === 'copilot' && (
-                  <CopilotChat evaluationId={analysisData.evaluation_id} initialContext={analysisData} />
-                )}
+              <div className="command-layout">
+                {/* Left Command Center Sidebar */}
+                <CommandSidebar
+                  data={analysisData}
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                  isOpen={commandSidebarOpen}
+                  onToggle={() => setCommandSidebarOpen(prev => !prev)}
+                  onReset={handleReset}
+                  onOpenHistory={() => setIsHistoryOpen(true)}
+                  currentUser={currentUser}
+                />
+
+                {/* Center / Right Command Center Deck */}
+                <div className="command-deck">
+                  <div className={`command-deck-inner ${activeTab === 'copilot' ? 'copilot-active' : ''}`}>
+                    {activeTab === 'overview' && (
+                      <OverviewSection data={analysisData} setActiveTab={setActiveTab} />
+                    )}
+                    {activeTab === 'roadmap' && (
+                      <RoadmapSection data={analysisData} onRoadmapUpdate={handleRoadmapUpdate} />
+                    )}
+                    {activeTab === 'resume' && (
+                      <ResumeSection data={analysisData} />
+                    )}
+                    {activeTab === 'dev' && (
+                      <DevSignalsSection data={analysisData} />
+                    )}
+                    {activeTab === 'verification' && (
+                      <CrossVerificationSection data={analysisData} />
+                    )}
+                    {activeTab === 'jobs' && (
+                      <JobMatchesSection
+                        data={analysisData}
+                        onJdMatchUpdate={handleCustomJdUpdate}
+                        onRoadmapUpdate={handleRoadmapUpdate}
+                        setActiveTab={setActiveTab}
+                      />
+                    )}
+                    {activeTab === 'copilot' && (
+                      <CopilotChat evaluationId={analysisData.evaluation_id} initialContext={analysisData} />
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </>
@@ -309,60 +330,7 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer style={{
-        borderTop: '1px solid var(--border-subtle)',
-        padding: '24px 20px',
-        textAlign: 'center',
-        color: 'var(--text-muted)',
-        fontSize: '0.8rem',
-        background: 'var(--bg-surface)',
-        marginTop: 'auto'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 6 }}>
-          <button 
-            onClick={() => setCurrentView('landing')} 
-            style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.8rem' }}
-          >
-            Home
-          </button>
-          <span>•</span>
-          <button 
-            onClick={() => setCurrentView('app')} 
-            style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.8rem' }}
-          >
-            Evaluate Profile
-          </button>
-          {currentUser && (
-            <>
-              <button 
-                onClick={() => setIsHistoryOpen(true)} 
-                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.8rem' }}
-              >
-                Audit History
-              </button>
-              <span>•</span>
-            </>
-          )}
-          {!currentUser ? (
-            <button 
-              onClick={() => handleOpenAuth('login')} 
-              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.8rem' }}
-            >
-              Sign In
-            </button>
-          ) : (
-            <button 
-              onClick={handleLogout} 
-              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.8rem' }}
-            >
-              Sign Out
-            </button>
-          )}
-        </div>
-        <div>
-          CareerLens AI • Next-Generation Candidate Verification & Career Intelligence
-        </div>
-      </footer>
+      
 
       {/* Full Audit History Modal */}
       <HistoryModal

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, FileCheck, Code, AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Upload, FileCheck, Code, AlertCircle, ArrowRight, CheckCircle2, Shield, Sparkles } from 'lucide-react';
 import { GithubIcon } from './Icons';
 
 export default function HeroUpload({ onAnalyze, isLoading }) {
@@ -59,48 +59,59 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
   };
 
   return (
-    <div className="hero-upload-container">
-      {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: 32 }}>
+    <div style={{
+      width: '100%',
+      maxWidth: 780,
+      margin: '36px auto 64px',
+      padding: '0 20px'
+    }}>
+      {/* Header & Eyebrow */}
+      <div style={{ textAlign: 'center', marginBottom: 36 }}>
         <div style={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: 6,
-          background: 'var(--bg-subtle)',
+          gap: 7,
+          background: 'var(--primary-subtle)',
           border: '1px solid var(--border-subtle)',
           padding: '4px 14px',
           borderRadius: 20,
           marginBottom: 16
         }}>
-          <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-            Candidate Intelligence & Verification
+          <span style={{
+            fontSize: '0.74rem',
+            fontWeight: 700,
+            color: 'var(--primary)',
+            letterSpacing: '0.04em',
+            textTransform: 'uppercase'
+          }}>
+            Multi-Signal Candidate Intelligence
           </span>
         </div>
 
         <h1 className="font-display" style={{
-          fontSize: 'clamp(1.8rem, 4vw, 2.7rem)',
+          fontSize: 'clamp(1.9rem, 4.2vw, 2.75rem)',
           fontWeight: 800,
           color: 'var(--text-main)',
-          lineHeight: 1.2,
-          letterSpacing: '-0.03em',
-          marginBottom: 12
+          lineHeight: 1.18,
+          letterSpacing: '-0.035em',
+          marginBottom: 14
         }}>
-          Verify skills, optimize ATS score, and plan your career
+          Verify skills, audit ATS score, & build your career roadmap
         </h1>
 
         <p style={{
           fontSize: '0.98rem',
-          color: 'var(--text-muted)',
+          color: 'var(--text-secondary)',
           maxWidth: 620,
           margin: '0 auto',
-          lineHeight: 1.55
+          lineHeight: 1.6
         }}>
-          Upload your resume to audit ATS parsing, cross-verify declared skills against live GitHub repositories and LeetCode, and get an actionable roadmap.
+          Upload your resume to audit ATS syntax compliance, cross-verify declared skills against live GitHub & LeetCode telemetry, and unlock personalized action plans.
         </p>
       </div>
 
       {/* Main Upload Card */}
-      <div className="card-solid" style={{ padding: '28px' }}>
+      <div className="card-solid" style={{ padding: '36px 36px 32px' }}>
         <form onSubmit={handleSubmit}>
           {/* PDF Dropzone */}
           <div
@@ -111,12 +122,12 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
             style={{
               border: `2px dashed ${isDragOver ? 'var(--primary)' : file ? 'var(--emerald)' : 'var(--border-medium)'}`,
               background: isDragOver ? 'var(--primary-subtle)' : file ? 'var(--emerald-subtle)' : 'var(--bg-subtle)',
-              borderRadius: 12,
-              padding: 'clamp(20px, 4vw, 36px) 16px',
+              borderRadius: 'var(--radius-md)',
+              padding: '40px 24px',
               textAlign: 'center',
               cursor: 'pointer',
-              transition: 'all 0.15s ease',
-              marginBottom: 16
+              transition: 'all 0.2s ease',
+              marginBottom: 24
             }}
           >
             <input
@@ -128,198 +139,211 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
             />
 
             {file ? (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
                 <div style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 10,
-                  background: '#ffffff',
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
+                  background: 'var(--bg-surface)',
                   border: '1px solid var(--emerald-border)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'var(--emerald)'
+                  color: 'var(--emerald)',
+                  boxShadow: 'var(--shadow-xs)'
                 }}>
-                  <FileCheck size={24} />
+                  <FileCheck size={26} />
                 </div>
-                <div style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-main)', wordBreak: 'break-all' }}>
-                  {file.name}
-                </div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                  {(file.size / 1024).toFixed(1)} KB • Ready for extraction
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '0.96rem', color: 'var(--text-main)', wordBreak: 'break-all' }}>
+                    {file.name}
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                    {(file.size / 1024).toFixed(1)} KB • Document parsed & ready
+                  </div>
                 </div>
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); setFile(null); }}
                   style={{
-                    background: 'transparent',
+                    background: 'none',
                     border: 'none',
                     color: 'var(--rose)',
-                    fontSize: '0.78rem',
+                    fontSize: '0.8rem',
                     fontWeight: 600,
                     cursor: 'pointer',
-                    marginTop: 2,
+                    marginTop: 4,
                     textDecoration: 'underline'
                   }}
                 >
-                  Change file
+                  Choose a different file
                 </button>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
                 <div style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 10,
-                  background: '#ffffff',
-                  border: '1px solid var(--border-medium)',
+                  width: 50,
+                  height: 50,
+                  borderRadius: 12,
+                  background: 'var(--bg-surface)',
+                  border: '1px solid var(--border-subtle)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'var(--text-secondary)'
+                  color: 'var(--primary)',
+                  boxShadow: 'var(--shadow-xs)'
                 }}>
-                  <Upload size={22} />
+                  <Upload size={24} />
                 </div>
                 <div>
-                  <div style={{ fontWeight: 600, fontSize: '0.92rem', color: 'var(--text-main)', marginBottom: 2 }}>
-                    Click to browse or drag and drop your Resume PDF
+                  <div style={{ fontWeight: 700, fontSize: '0.96rem', color: 'var(--text-main)', marginBottom: 4 }}>
+                    Drop your Resume PDF here, or <span style={{ color: 'var(--primary)', textDecoration: 'underline' }}>browse</span>
                   </div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                    Standard PDF format up to 10MB • Preserves layout & structure
+                  <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                    Standard PDF format up to 10MB • Text-layer & single/multi-column compatible
                   </div>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Social Profiles Grid */}
+          {/* Verification Profiles Grid (GitHub + LeetCode) */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: 12,
-            marginBottom: 18
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 18,
+            marginBottom: 24
           }}>
-            {/* GitHub Username - Mandatory */}
-            <div style={{
-              background: 'var(--bg-subtle)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: 10,
-              padding: '12px 14px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10
-            }}>
-              <GithubIcon size={19} color="#334155" />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
-                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
-                    GitHub Handle *
-                  </span>
-                  <span className="badge badge-rose" style={{ fontSize: '0.62rem', padding: '0 5px' }}>
-                    Mandatory
-                  </span>
-                </div>
+            {/* GitHub Username */}
+            <div>
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                color: 'var(--text-main)',
+                marginBottom: 8
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <GithubIcon size={15} color="var(--text-secondary)" />
+                  <span>GitHub Username</span>
+                  <span style={{ color: 'var(--primary)', fontWeight: 700 }}>*</span>
+                </span>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Public Code Signals</span>
+              </label>
+
+              <div style={{
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center'
+              }}>
                 <input
                   type="text"
                   required
-                  placeholder="Enter GitHub handle"
+                  placeholder="e.g. octocat"
                   value={githubUser}
                   onChange={(e) => setGithubUser(e.target.value)}
                   style={{
                     width: '100%',
-                    background: 'transparent',
-                    border: 'none',
+                    height: 44,
+                    padding: '0 14px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px solid var(--border-medium)',
+                    background: 'var(--bg-surface)',
                     color: 'var(--text-main)',
-                    fontSize: '0.88rem',
-                    outline: 'none',
-                    fontFamily: 'inherit',
-                    marginTop: 1,
-                    padding: 0,
-                    boxShadow: 'none'
+                    fontSize: '0.9rem',
+                    fontFamily: 'inherit'
                   }}
                 />
               </div>
             </div>
 
-            {/* LeetCode Username - Mandatory */}
-            <div style={{
-              background: 'var(--bg-subtle)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: 10,
-              padding: '12px 14px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10
-            }}>
-              <Code size={19} color="#d97706" />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
-                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
-                    LeetCode Handle *
-                  </span>
-                  <span className="badge badge-rose" style={{ fontSize: '0.62rem', padding: '0 5px' }}>
-                    Mandatory
-                  </span>
-                </div>
+            {/* LeetCode Username */}
+            <div>
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                color: 'var(--text-main)',
+                marginBottom: 8
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <Code size={15} color="var(--text-secondary)" />
+                  <span>LeetCode Username</span>
+                  <span style={{ color: 'var(--primary)', fontWeight: 700 }}>*</span>
+                </span>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>DSA Problem Telemetry</span>
+              </label>
+
+              <div style={{
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center'
+              }}>
                 <input
                   type="text"
                   required
-                  placeholder="Enter LeetCode handle"
+                  placeholder="e.g. leetcoder"
                   value={leetcodeUser}
                   onChange={(e) => setLeetcodeUser(e.target.value)}
                   style={{
                     width: '100%',
-                    background: 'transparent',
-                    border: 'none',
+                    height: 44,
+                    padding: '0 14px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px solid var(--border-medium)',
+                    background: 'var(--bg-surface)',
                     color: 'var(--text-main)',
-                    fontSize: '0.88rem',
-                    outline: 'none',
-                    fontFamily: 'inherit',
-                    marginTop: 1,
-                    padding: 0,
-                    boxShadow: 'none'
+                    fontSize: '0.9rem',
+                    fontFamily: 'inherit'
                   }}
                 />
               </div>
             </div>
           </div>
 
-          {/* Error Message */}
+          {/* Validation Error Banner */}
           {validationError && (
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 8,
-              padding: '10px 14px',
-              borderRadius: 8,
+              gap: 10,
+              padding: '12px 16px',
+              borderRadius: 'var(--radius-sm)',
               background: 'var(--rose-subtle)',
               border: '1px solid var(--rose-border)',
               color: 'var(--rose)',
-              fontSize: '0.84rem',
-              marginBottom: 16
+              fontSize: '0.85rem',
+              fontWeight: 500,
+              marginBottom: 20
             }}>
-              <AlertCircle size={15} />
+              <AlertCircle size={16} style={{ flexShrink: 0 }} />
               <span>{validationError}</span>
             </div>
           )}
 
-          {/* Form Actions */}
+          {/* Action Row */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            gap: 16,
             flexWrap: 'wrap',
-            gap: 12
+            paddingTop: 8,
+            borderTop: '1px solid var(--border-subtle)'
           }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 6,
+              gap: 8,
               color: 'var(--text-muted)',
-              fontSize: '0.78rem'
+              fontSize: '0.8rem'
             }}>
-              <CheckCircle2 size={14} color="var(--emerald)" />
-              <span>Resume and engineering signals analyzed privately</span>
+              <Shield size={14} color="var(--emerald)" />
+              <span>Private analysis • Your code and resume are never stored</span>
             </div>
 
             <button
@@ -327,14 +351,13 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
               disabled={isLoading}
               className="btn-primary"
               style={{
-                padding: '12px 28px',
+                height: 46,
+                padding: '0 28px',
                 fontSize: '0.92rem',
-                flexGrow: 1,
-                maxWidth: '100%',
-                minWidth: '220px'
+                minWidth: 220
               }}
             >
-              <span>{isLoading ? 'Running Pipeline...' : 'Evaluate Developer Profile'}</span>
+              <span>{isLoading ? 'Running Audit Pipeline...' : 'Audit Developer Profile'}</span>
               <ArrowRight size={16} />
             </button>
           </div>

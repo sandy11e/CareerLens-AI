@@ -37,7 +37,7 @@ export default function CrossVerificationSection({ data }) {
                 {unverifiedSkills.length} Unverified Claims
               </span>
               {omittedStrengths.length > 0 && (
-                <span className="badge badge-blue">
+                <span className="badge badge-primary">
                   {omittedStrengths.length} Unclaimed Strengths Found
                 </span>
               )}
@@ -88,11 +88,11 @@ export default function CrossVerificationSection({ data }) {
       {omittedStrengths.length > 0 && (
         <div className="card-solid" style={{
           padding: '18px 22px',
-          background: 'var(--sky-subtle)',
-          border: '1px solid #bae6fd'
+          background: 'var(--primary-subtle)',
+          border: '1px solid var(--border-medium)'
         }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-            <PlusCircle size={18} color="var(--sky)" style={{ marginTop: 2, flexShrink: 0 }} />
+            <PlusCircle size={18} color="var(--primary)" style={{ marginTop: 2, flexShrink: 0 }} />
             <div>
               <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '0.92rem', marginBottom: 2 }}>
                 Unclaimed Strengths Detected in Public Code
@@ -103,9 +103,9 @@ export default function CrossVerificationSection({ data }) {
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 {omittedStrengths.map((str, idx) => (
                   <span key={idx} style={{
-                    background: '#ffffff',
-                    border: '1px solid #bae6fd',
-                    color: 'var(--sky)',
+                    background: 'var(--card-bg)',
+                    border: '1px solid var(--border-medium)',
+                    color: 'var(--primary)',
                     padding: '3px 10px',
                     borderRadius: 16,
                     fontSize: '0.74rem',
@@ -140,7 +140,7 @@ export default function CrossVerificationSection({ data }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {verifiedSkills.map((item, idx) => (
               <div key={idx} style={{
-                background: '#ffffff',
+                background: 'var(--card-bg)',
                 border: '1px solid var(--emerald-border)',
                 borderRadius: 10,
                 padding: '12px 14px',

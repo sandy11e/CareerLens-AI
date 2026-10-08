@@ -92,7 +92,7 @@ export default function RoadmapSection({ data, onRoadmapUpdate }) {
               height: 36,
               borderRadius: 8,
               background: 'var(--primary-subtle)',
-              border: '1px solid #bfdbfe',
+              border: '1px solid var(--border-subtle)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
