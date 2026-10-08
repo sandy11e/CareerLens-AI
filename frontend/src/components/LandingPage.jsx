@@ -95,7 +95,7 @@ export default function LandingPage({
       {/* ========== HERO SECTION ========== */}
       <section style={{
         position: 'relative',
-        padding: '72px 24px 40px',
+        padding: 'clamp(36px, 6vw, 72px) clamp(14px, 4vw, 24px) 36px',
         textAlign: 'center',
         display: 'flex',
         flexDirection: 'column',
@@ -124,9 +124,13 @@ export default function LandingPage({
           display: 'inline-flex', alignItems: 'center', gap: 8,
           background: 'rgba(99, 102, 241, 0.08)',
           border: '1px solid rgba(99, 102, 241, 0.2)',
-          padding: '6px 18px', borderRadius: 24,
-          fontSize: '0.82rem', color: 'var(--primary)', fontWeight: 600,
-          marginBottom: 28, backdropFilter: 'blur(8px)',
+          padding: '6px 16px', borderRadius: 24,
+          fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 600,
+          marginBottom: 24, backdropFilter: 'blur(8px)',
+          maxWidth: '100%',
+          textAlign: 'center',
+          flexWrap: 'wrap',
+          justifyContent: 'center'
         }}>
           <Sparkles size={14} />
           <span>360° Developer Profile Evaluation</span>
@@ -137,11 +141,11 @@ export default function LandingPage({
         {/* Main headline */}
         <h1 className="font-display animate-fade-in-up" style={{
           position: 'relative', zIndex: 1,
-          fontSize: 'clamp(2.4rem, 5.5vw, 4rem)',
-          fontWeight: 900, lineHeight: 1.1,
+          fontSize: 'clamp(1.9rem, 5.5vw, 3.8rem)',
+          fontWeight: 900, lineHeight: 1.15,
           color: 'var(--text-main)',
           maxWidth: 880, letterSpacing: '-0.035em',
-          marginBottom: 20,
+          marginBottom: 18,
         }}>
           Prove Your Engineering
           <br />
@@ -151,9 +155,9 @@ export default function LandingPage({
         {/* Subtitle */}
         <p className="animate-fade-in-up delay-200" style={{
           position: 'relative', zIndex: 1,
-          fontSize: 'clamp(1rem, 2vw, 1.18rem)',
+          fontSize: 'clamp(0.92rem, 2vw, 1.12rem)',
           color: 'var(--text-muted)', maxWidth: 640,
-          lineHeight: 1.65, marginBottom: 40,
+          lineHeight: 1.6, marginBottom: 36,
         }}>
           Traditional ATS scanners only match keywords. CareerLens AI audits your resume compliance,
           validates real GitHub code, evaluates LeetCode performance, and matches any custom Job Description.
@@ -162,17 +166,21 @@ export default function LandingPage({
         {/* Hero CTAs */}
         <div className="animate-fade-in-up delay-300" style={{
           position: 'relative', zIndex: 1,
-          display: 'flex', alignItems: 'center', gap: 14,
+          display: 'flex', alignItems: 'center', gap: 12,
           flexWrap: 'wrap', justifyContent: 'center',
-          marginBottom: 48,
+          marginBottom: 40,
+          width: '100%',
+          maxWidth: 440
         }}>
           <button
             onClick={onStartAudit}
             className="btn-brand"
             style={{
-              padding: '15px 36px', fontSize: '1.02rem', fontWeight: 700,
-              boxShadow: '0 8px 32px var(--primary-glow)',
+              padding: '14px 32px', fontSize: '1rem', fontWeight: 700,
+              boxShadow: '0 8px 24px var(--primary-glow)',
               borderRadius: 'var(--radius-lg)',
+              flex: '1 1 200px',
+              minHeight: 48
             }}
           >
             <span>{currentUser ? 'Go to Evaluator' : 'Get Started Free'}</span>
@@ -183,7 +191,13 @@ export default function LandingPage({
             <button
               onClick={() => onOpenAuth('login')}
               className="btn-secondary"
-              style={{ padding: '15px 30px', fontSize: '0.96rem', fontWeight: 600, borderRadius: 'var(--radius-lg)' }}
+              style={{
+                padding: '14px 28px', fontSize: '0.94rem', fontWeight: 600,
+                borderRadius: 'var(--radius-lg)',
+                flex: '1 1 140px',
+                minHeight: 48,
+                justifyContent: 'center'
+              }}
             >
               Sign In
             </button>
@@ -193,9 +207,9 @@ export default function LandingPage({
         {/* Trust signals */}
         <div className="animate-fade-in-up delay-400" style={{
           position: 'relative', zIndex: 1,
-          display: 'flex', alignItems: 'center', gap: 24,
+          display: 'flex', alignItems: 'center', gap: 20,
           flexWrap: 'wrap', justifyContent: 'center',
-          fontSize: '0.82rem', color: 'var(--text-muted)',
+          fontSize: '0.8rem', color: 'var(--text-muted)',
         }}>
           {['Authenticated Workspace', 'PDF Resume & JD Parser', 'AI Career Copilot'].map((item, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -209,30 +223,30 @@ export default function LandingPage({
         <div className="animate-fade-in-up delay-500" style={{
           position: 'relative', zIndex: 1,
           width: '100%', maxWidth: 860,
-          marginTop: 56,
+          marginTop: 44,
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-          gap: 14,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+          gap: 12,
         }}>
           {stats.map((stat, i) => {
             const Icon = stat.icon;
             return (
               <div key={i} className="card-solid interactive-card" style={{
-                padding: '20px', textAlign: 'center',
+                padding: '16px 14px', textAlign: 'center',
                 animationDelay: `${0.5 + i * 0.1}s`,
               }}>
                 <div style={{
-                  width: 38, height: 38, borderRadius: 10,
+                  width: 36, height: 36, borderRadius: 10,
                   background: 'var(--primary-subtle)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  margin: '0 auto 10px',
+                  margin: '0 auto 8px',
                 }}>
-                  <Icon size={18} color="var(--primary)" />
+                  <Icon size={17} color="var(--primary)" />
                 </div>
-                <div className="font-display" style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-main)' }}>
+                <div className="font-display" style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-main)' }}>
                   {stat.value}
                 </div>
-                <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: 2, fontWeight: 500 }}>
+                <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: 2, fontWeight: 500 }}>
                   {stat.label}
                 </div>
               </div>
@@ -242,24 +256,24 @@ export default function LandingPage({
       </section>
 
       {/* ========== FEATURES SECTION ========== */}
-      <section id="features" style={{ maxWidth: 1120, margin: '0 auto', width: '100%', padding: '0 20px', scrollMarginTop: 90 }}>
-        <div className="animate-fade-in-up" style={{ textAlign: 'center', marginBottom: 48 }}>
-          <span className="badge badge-gradient" style={{ fontSize: '0.76rem', marginBottom: 14, display: 'inline-flex' }}>
+      <section id="features" style={{ maxWidth: 1120, margin: '0 auto', width: '100%', padding: '0 16px', scrollMarginTop: 90 }}>
+        <div className="animate-fade-in-up" style={{ textAlign: 'center', marginBottom: 40 }}>
+          <span className="badge badge-gradient" style={{ fontSize: '0.76rem', marginBottom: 12, display: 'inline-flex' }}>
             <Zap size={12} />
             Complete 360° Intelligence
           </span>
-          <h2 className="font-display" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.4rem)', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.025em' }}>
+          <h2 className="font-display" style={{ fontSize: 'clamp(1.6rem, 4vw, 2.3rem)', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.025em' }}>
             Engineered For Modern Engineers
           </h2>
-          <p style={{ fontSize: '0.92rem', color: 'var(--text-muted)', maxWidth: 560, margin: '10px auto 0' }}>
+          <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', maxWidth: 560, margin: '10px auto 0' }}>
             Everything you need to audit your application materials, uncover skill gaps, and prepare for interviews.
           </p>
         </div>
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(330px, 1fr))',
-          gap: 18,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: 16,
         }}>
           {features.map((item, idx) => {
             const Icon = item.icon;
@@ -268,23 +282,23 @@ export default function LandingPage({
                 key={idx} 
                 className="card-solid interactive-card animate-fade-in-up"
                 style={{ 
-                  padding: '28px 26px',
+                  padding: '24px 20px',
                   animationDelay: `${idx * 0.08}s`,
                 }}
               >
                 <div style={{
-                  width: 48, height: 48, borderRadius: 14,
+                  width: 44, height: 44, borderRadius: 12,
                   background: item.gradient,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  marginBottom: 18,
+                  marginBottom: 16,
                   transition: 'transform 0.3s ease',
                 }}>
-                  <Icon size={22} color={item.color} />
+                  <Icon size={20} color={item.color} />
                 </div>
-                <h3 className="font-display" style={{ fontSize: '1.08rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>
+                <h3 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>
                   {item.title}
                 </h3>
-                <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
                   {item.description}
                 </p>
               </div>
@@ -298,41 +312,41 @@ export default function LandingPage({
         background: 'var(--gradient-surface)',
         borderTop: '1px solid var(--border-subtle)',
         borderBottom: '1px solid var(--border-subtle)',
-        padding: '72px 20px',
+        padding: 'clamp(44px, 7vw, 72px) clamp(16px, 4vw, 20px)',
         scrollMarginTop: 90,
       }}>
         <div style={{ maxWidth: 1040, margin: '0 auto', textAlign: 'center' }}>
-          <span className="badge badge-indigo" style={{ fontSize: '0.76rem', marginBottom: 14, display: 'inline-flex' }}>
+          <span className="badge badge-indigo" style={{ fontSize: '0.76rem', marginBottom: 12, display: 'inline-flex' }}>
             <Lock size={11} />
             Secure Workflow
           </span>
-          <h2 className="font-display" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.2rem)', fontWeight: 800, color: 'var(--text-main)', marginBottom: 48, letterSpacing: '-0.02em' }}>
+          <h2 className="font-display" style={{ fontSize: 'clamp(1.6rem, 4vw, 2.2rem)', fontWeight: 800, color: 'var(--text-main)', marginBottom: 40, letterSpacing: '-0.02em' }}>
             How CareerLens Evaluates Your Profile
           </h2>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: 20, textAlign: 'left',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: 16, textAlign: 'left',
           }}>
             {steps.map((st, i) => {
               const Icon = st.icon;
               return (
-                <div key={i} className="card-solid animate-fade-in-up" style={{ padding: '28px 24px', animationDelay: `${i * 0.12}s` }}>
+                <div key={i} className="card-solid animate-fade-in-up" style={{ padding: '24px 20px', animationDelay: `${i * 0.12}s` }}>
                   <div style={{
-                    display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16,
+                    display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14,
                   }}>
                     <div style={{
-                      width: 44, height: 44, borderRadius: 12,
+                      width: 40, height: 40, borderRadius: 10,
                       background: 'var(--gradient-accent)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: 'white', fontWeight: 800, fontSize: '0.9rem',
+                      color: 'white', fontWeight: 800, fontSize: '0.88rem',
                       boxShadow: '0 4px 12px var(--primary-glow)',
                     }}>
                       {st.num}
                     </div>
                     <div>
-                      <h3 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                      <h3 className="font-display" style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-main)' }}>
                         {st.title}
                       </h3>
                     </div>
@@ -348,18 +362,18 @@ export default function LandingPage({
       </section>
 
       {/* ========== COMPARISON SECTION ========== */}
-      <section style={{ maxWidth: 940, margin: '0 auto', width: '100%', padding: '0 20px' }}>
-        <div className="card-solid" style={{ padding: '40px 32px', overflow: 'visible' }}>
-          <h3 className="font-display" style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: 24, textAlign: 'center' }}>
+      <section style={{ maxWidth: 940, margin: '0 auto', width: '100%', padding: '0 16px' }}>
+        <div className="card-solid" style={{ padding: 'clamp(24px, 5vw, 40px) clamp(16px, 4vw, 32px)', overflow: 'visible' }}>
+          <h3 className="font-display" style={{ fontSize: 'clamp(1.2rem, 3vw, 1.35rem)', fontWeight: 800, color: 'var(--text-main)', marginBottom: 20, textAlign: 'center' }}>
             Why Single-Signal Evaluation Fails Modern Hiring
           </h3>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
-            <div className="animate-slide-left" style={{ background: 'linear-gradient(135deg, #fff1f2, #ffe4e6)', border: '1px solid #fecdd3', borderRadius: 14, padding: '22px' }}>
-              <div style={{ fontWeight: 700, color: 'var(--rose)', fontSize: '0.9rem', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+            <div className="animate-slide-left" style={{ background: 'linear-gradient(135deg, #fff1f2, #ffe4e6)', border: '1px solid #fecdd3', borderRadius: 14, padding: '20px 18px' }}>
+              <div style={{ fontWeight: 700, color: 'var(--rose)', fontSize: '0.9rem', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{ fontSize: '1.1rem' }}>✕</span> Traditional ATS Scanners
               </div>
-              <ul style={{ paddingLeft: 18, fontSize: '0.82rem', color: '#9f1239', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <ul style={{ paddingLeft: 16, fontSize: '0.82rem', color: '#9f1239', display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <li>Only search for raw keyword repetitions</li>
                 <li>Cannot verify if you actually built projects</li>
                 <li>Ignores code quality and commit history</li>
@@ -367,11 +381,11 @@ export default function LandingPage({
               </ul>
             </div>
 
-            <div className="animate-slide-right" style={{ background: 'linear-gradient(135deg, #ecfdf5, #d1fae5)', border: '1px solid #a7f3d0', borderRadius: 14, padding: '22px' }}>
-              <div style={{ fontWeight: 700, color: 'var(--emerald)', fontSize: '0.9rem', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div className="animate-slide-right" style={{ background: 'linear-gradient(135deg, #ecfdf5, #d1fae5)', border: '1px solid #a7f3d0', borderRadius: 14, padding: '20px 18px' }}>
+              <div style={{ fontWeight: 700, color: 'var(--emerald)', fontSize: '0.9rem', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{ fontSize: '1.1rem' }}>✓</span> CareerLens Multi-Signal Engine
               </div>
-              <ul style={{ paddingLeft: 18, fontSize: '0.82rem', color: '#166534', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <ul style={{ paddingLeft: 16, fontSize: '0.82rem', color: '#166534', display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <li>Multi-dimensional parsing: layout, metrics, certs</li>
                 <li>Inspects real repository architecture & commits</li>
                 <li>Cross-verifies claims for Portfolio Trust Score</li>
@@ -383,13 +397,13 @@ export default function LandingPage({
       </section>
 
       {/* ========== BOTTOM CTA ========== */}
-      <section style={{ maxWidth: 960, margin: '0 auto', width: '100%', padding: '0 20px' }}>
+      <section style={{ maxWidth: 960, margin: '0 auto', width: '100%', padding: '0 16px' }}>
         <div style={{
           background: 'var(--gradient-accent)',
           backgroundSize: '200% 200%',
           animation: 'gradientShift 6s ease infinite',
-          borderRadius: 'var(--radius-2xl)',
-          padding: '56px 40px',
+          borderRadius: 'var(--radius-xl)',
+          padding: 'clamp(36px, 6vw, 56px) clamp(20px, 5vw, 40px)',
           textAlign: 'center',
           color: '#ffffff',
           boxShadow: '0 16px 48px var(--primary-glow)',
@@ -407,19 +421,19 @@ export default function LandingPage({
           }} />
 
           <div style={{
-            width: 56, height: 56, borderRadius: 14,
+            width: 48, height: 48, borderRadius: 12,
             background: 'rgba(255,255,255,0.15)',
             backdropFilter: 'blur(8px)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            marginBottom: 20,
+            marginBottom: 16,
           }}>
-            <Star size={26} />
+            <Star size={24} />
           </div>
 
-          <h2 className="font-display" style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.4rem)', fontWeight: 800, marginBottom: 12, letterSpacing: '-0.02em', position: 'relative', zIndex: 1 }}>
+          <h2 className="font-display" style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.3rem)', fontWeight: 800, marginBottom: 10, letterSpacing: '-0.02em', position: 'relative', zIndex: 1 }}>
             Ready To Evaluate Your Profile?
           </h2>
-          <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.85)', maxWidth: 560, lineHeight: 1.65, marginBottom: 32, position: 'relative', zIndex: 1 }}>
+          <p style={{ fontSize: '0.92rem', color: 'rgba(255,255,255,0.85)', maxWidth: 540, lineHeight: 1.6, marginBottom: 28, position: 'relative', zIndex: 1 }}>
             Create an account to benchmark your resume, audit your GitHub repos, and prepare for your dream role.
           </p>
 

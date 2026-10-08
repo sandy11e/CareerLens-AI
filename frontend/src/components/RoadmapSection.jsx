@@ -117,9 +117,9 @@ export default function RoadmapSection({ data, onRoadmapUpdate }) {
 
           <form
             onSubmit={(e) => { e.preventDefault(); handleRegenerateRoadmap(); }}
-            style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', maxWidth: '100%' }}
           >
-            <div style={{ minWidth: 240 }}>
+            <div style={{ flex: '1 1 180px', minWidth: 0 }}>
               <input
                 type="text"
                 placeholder="Enter role (e.g. AI Engineer, DevOps)..."
@@ -128,7 +128,7 @@ export default function RoadmapSection({ data, onRoadmapUpdate }) {
                 disabled={isGenerating}
                 style={{
                   width: '100%',
-                  padding: '8px 12px',
+                  padding: '9px 12px',
                   borderRadius: 8,
                   fontSize: '0.86rem'
                 }}
@@ -139,7 +139,7 @@ export default function RoadmapSection({ data, onRoadmapUpdate }) {
               type="submit"
               disabled={isGenerating}
               className="btn-primary"
-              style={{ padding: '8px 16px', fontSize: '0.82rem' }}
+              style={{ padding: '9px 16px', fontSize: '0.82rem', whiteSpace: 'nowrap' }}
             >
               {isGenerating ? (
                 <>

@@ -612,43 +612,135 @@ textarea::placeholder {
 
 @media (max-width: 768px) {
   .app-header-inner {
-    padding: 8px 12px;
-    gap: 6px;
+    padding: 10px 14px;
+    gap: 8px;
   }
   .app-main-container {
-    padding: 12px 10px 36px;
+    padding: 12px 12px 36px;
   }
   .hero-upload-container {
-    padding: 0 6px;
-    margin: 12px auto;
+    padding: 0 4px;
+    margin: 8px auto 20px;
   }
-  .card-solid {
-    border-radius: 12px !important;
+  .card-solid,
+  .glass-panel {
+    border-radius: 14px !important;
+    padding: 18px 16px !important;
   }
   .nav-scroll-container {
     width: 100% !important;
-    order: 3;
     padding: 6px 4px !important;
-    margin-top: 4px;
+    margin-top: 2px;
+  }
+  .hide-on-mobile {
+    display: none !important;
+  }
+  .show-on-mobile {
+    display: flex !important;
   }
 }
 
 @media (max-width: 480px) {
-  .btn-primary, .btn-secondary {
-    padding: 9px 14px;
-    font-size: 0.82rem;
+  .app-header-inner {
+    padding: 8px 10px;
+  }
+  .app-main-container {
+    padding: 10px 8px 30px;
+  }
+  .card-solid,
+  .glass-panel {
+    border-radius: 12px !important;
+    padding: 16px 12px !important;
+  }
+  .btn-primary, .btn-secondary, .btn-brand {
+    padding: 11px 16px;
+    font-size: 0.86rem;
+    min-height: 44px;
+  }
+  .hero-upload-container {
+    padding: 0;
   }
 }
 
-@media (max-width: 640px) {
+/* Universal responsive grid protection for mobile */
+@media (max-width: 680px) {
   div[style*="minmax(340px"],
+  div[style*="minmax(330px"],
   div[style*="minmax(320px"],
+  div[style*="minmax(300px"],
   div[style*="minmax(280px"],
   div[style*="minmax(260px"],
   div[style*="minmax(250px"],
-  div[style*="minmax(240px"] {
+  div[style*="minmax(240px"],
+  div[style*="minmax(220px"],
+  div[style*="minmax(210px"],
+  div[style*="minmax(200px"],
+  div[style*="minmax(180px"] {
     grid-template-columns: 1fr !important;
   }
+
+  .roadmap-stepper {
+    grid-template-columns: 1fr !important;
+  }
+
+  .arch-diagram-flow {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Mobile Drawer & Overlay Styles */
+.mobile-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 99;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.mobile-nav-drawer {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-subtle);
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.15);
+  padding: 18px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 100;
+  animation: fadeInDown 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.mobile-nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--bg-subtle);
+  color: var(--text-main);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.mobile-nav-link:hover,
+.mobile-nav-link:active {
+  background: var(--primary-subtle);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: var(--primary);
+}
+
+.show-on-mobile {
+  display: none;
 }
 
 /* ==================== CHAT-GPT STYLE LAYOUT ==================== */
@@ -989,6 +1081,20 @@ textarea::placeholder {
 .visual-timeline-item:hover .visual-timeline-node {
   transform: scale(1.15);
   box-shadow: 0 0 0 6px var(--primary-glow);
+}
+
+@media (max-width: 640px) {
+  .visual-timeline {
+    padding-left: 20px;
+  }
+  .visual-timeline::before {
+    left: 8px;
+  }
+  .visual-timeline-node {
+    left: -20px;
+    width: 20px;
+    height: 20px;
+  }
 }
 
 /* Multi-segment Ratio Bar */

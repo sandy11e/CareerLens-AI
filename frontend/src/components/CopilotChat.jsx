@@ -25,7 +25,7 @@ export default function CopilotChat({ evaluationId, initialContext }) {
   const [isListening, setIsListening] = useState(false);
   const [isSpeakingIdx, setIsSpeakingIdx] = useState(null);
   const [voiceSupported, setVoiceSupported] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== 'undefined' ? window.innerWidth > 768 : true);
 
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
@@ -314,11 +314,20 @@ export default function CopilotChat({ evaluationId, initialContext }) {
         </div>
       </div>
 
+      {/* Mobile backdrop for chat sidebar */}
+      {sidebarOpen && (
+        <div
+          className="mobile-nav-backdrop show-on-mobile"
+          style={{ zIndex: 35 }}
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* ========== MAIN CHAT AREA ========== */}
       <div className="chat-main">
         {/* Chat Header Bar */}
         <div style={{
-          padding: '10px 20px',
+          padding: '10px 16px',
           borderBottom: '1px solid var(--border-subtle)',
           display: 'flex',
           alignItems: 'center',
@@ -326,20 +335,20 @@ export default function CopilotChat({ evaluationId, initialContext }) {
           background: 'var(--bg-surface)',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {!sidebarOpen && (
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="btn-ghost"
-                style={{ padding: 6 }}
-              >
-                <PanelLeft size={16} />
-              </button>
-            )}
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="btn-ghost"
+              style={{ padding: 6, minHeight: 36, minWidth: 36, alignItems: 'center', justifyContent: 'center' }}
+              title={sidebarOpen ? "Hide conversations" : "Show conversations"}
+            >
+              {sidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeft size={18} />}
+            </button>
             <div style={{
               width: 30, height: 30, borderRadius: 8,
               background: 'var(--gradient-accent)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#ffffff'
+              color: '#ffffff',
+              flexShrink: 0
             }}>
               <Sparkles size={15} />
             </div>
@@ -373,30 +382,30 @@ export default function CopilotChat({ evaluationId, initialContext }) {
               alignItems: 'center',
               justifyContent: 'center',
               textAlign: 'center',
-              padding: '40px 20px',
-              gap: 24,
+              padding: 'clamp(20px, 5vw, 40px) 16px',
+              gap: 20,
             }}>
               <div style={{
-                width: 64, height: 64, borderRadius: 16,
+                width: 58, height: 58, borderRadius: 16,
                 background: 'var(--gradient-accent)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 color: 'white',
                 boxShadow: '0 8px 32px var(--primary-glow)',
                 animation: 'float 4s ease-in-out infinite'
               }}>
-                <Sparkles size={30} />
+                <Sparkles size={28} />
               </div>
 
               <div>
                 <h2 className="font-display" style={{
-                  fontSize: '1.5rem',
+                  fontSize: 'clamp(1.2rem, 3.5vw, 1.5rem)',
                   fontWeight: 800,
                   color: 'var(--text-main)',
                   marginBottom: 8
                 }}>
                   How can I help with {candidateName}?
                 </h2>
-                <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', maxWidth: 500 }}>
+                <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', maxWidth: 500, lineHeight: 1.55 }}>
                   I have your complete 360° profile loaded — resume audit, GitHub repositories, LeetCode stats, and job matches. Ask me anything about your career.
                 </p>
               </div>
@@ -404,7 +413,7 @@ export default function CopilotChat({ evaluationId, initialContext }) {
               {/* Quick Prompt Grid */}
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
                 gap: 10,
                 maxWidth: 560,
                 width: '100%',

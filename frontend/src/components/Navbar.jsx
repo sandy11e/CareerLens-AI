@@ -286,24 +286,33 @@ export default function Navbar({
             </div>
           )}
 
-          {/* Mobile hamburger */}
+          {/* Mobile hamburger toggle */}
           <button
-            className="btn-ghost"
-            style={{ display: 'none', padding: 6 }}
+            className="show-on-mobile btn-ghost"
+            style={{ padding: '8px', minHeight: 40, minWidth: 40, alignItems: 'center', justifyContent: 'center' }}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
           >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {mobileMenuOpen ? <X size={22} color="var(--primary)" /> : <Menu size={22} color="var(--text-main)" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile nav tabs for dashboard */}
+      {/* Mobile nav tabs for dashboard (visible on mobile when user has evaluation loaded) */}
       {hasData && currentView === 'app' && (
-        <div className="nav-scroll-container" style={{
-          display: 'none',
-          padding: '4px 8px',
+        <div className="show-on-mobile" style={{
+          width: '100%',
+          overflowX: 'auto',
+          padding: '6px 10px',
           borderTop: '1px solid var(--border-subtle)',
-          background: 'var(--bg-subtle)',
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          display: 'none',
+          alignItems: 'center',
+          gap: 6,
+          scrollbarWidth: 'none',
+          WebkitOverflowScrolling: 'touch'
         }}>
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -315,20 +324,22 @@ export default function Navbar({
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: 4,
-                  padding: '5px 10px',
-                  borderRadius: 8,
-                  border: 'none',
-                  background: isActive ? '#ffffff' : 'transparent',
-                  color: isActive ? 'var(--text-main)' : 'var(--text-muted)',
-                  fontWeight: isActive ? 600 : 500,
-                  fontSize: '0.74rem',
+                  gap: 6,
+                  padding: '7px 12px',
+                  borderRadius: 10,
+                  border: isActive ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid transparent',
+                  background: isActive ? 'var(--primary-subtle)' : 'var(--bg-subtle)',
+                  color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
+                  fontWeight: isActive ? 700 : 500,
+                  fontSize: '0.78rem',
                   cursor: 'pointer',
-                  boxShadow: isActive ? 'var(--shadow-xs)' : 'none',
+                  boxShadow: isActive ? '0 1px 4px var(--primary-glow)' : 'none',
                   whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                  minHeight: 34
                 }}
               >
-                <Icon size={13} color={isActive ? 'var(--primary)' : 'currentColor'} />
+                <Icon size={14} color={isActive ? 'var(--primary)' : 'currentColor'} />
                 <span>{tab.label}</span>
               </button>
             );
@@ -336,16 +347,184 @@ export default function Navbar({
         </div>
       )}
 
-      <style>{`
-        @media (max-width: 768px) {
-          .app-header-inner > nav.hide-on-mobile + div button[style*="display: none"] {
-            display: flex !important;
-          }
-          header > div:last-child {
-            display: flex !important;
-          }
-        }
-      `}</style>
+      {/* Mobile Menu Dropdown Drawer */}
+      {mobileMenuOpen && (
+        <>
+          <div className="mobile-nav-backdrop" onClick={() => setMobileMenuOpen(false)} />
+          <div className="mobile-nav-drawer">
+            {/* User Profile Card (if logged in) */}
+            {currentUser ? (
+              <div style={{
+                background: 'var(--bg-subtle)',
+                borderRadius: 12,
+                padding: '12px 14px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                border: '1px solid var(--border-subtle)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: 10,
+                    background: 'var(--gradient-accent)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: 'white', fontSize: '0.82rem', fontWeight: 800
+                  }}>
+                    {(currentUser.name || currentUser.email || '?')[0].toUpperCase()}
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>
+                      {currentUser.name || 'Member'}
+                    </div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                      {currentUser.email}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="glow-dot" style={{
+                  background: groqStatus?.groq_active ? 'var(--emerald)' : 'var(--amber)',
+                }} title={groqStatus?.groq_active ? 'AI Engine Active' : 'Fallback Engine'} />
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <button
+                  onClick={() => { setMobileMenuOpen(false); onOpenAuth('login'); }}
+                  className="btn-secondary"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => { setMobileMenuOpen(false); onOpenAuth('register'); }}
+                  className="btn-brand"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  Get Started
+                </button>
+              </div>
+            )}
+
+            {/* Navigation Options */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div
+                className="mobile-nav-link"
+                onClick={() => { setMobileMenuOpen(false); onNavigate('landing'); }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <Home size={17} color="var(--primary)" />
+                  <span>Home</span>
+                </div>
+              </div>
+
+              <div
+                className="mobile-nav-link"
+                onClick={() => { setMobileMenuOpen(false); onNavigate('app'); }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <Layers size={17} color="var(--primary)" />
+                  <span>{hasData ? 'Active Dashboard' : 'Candidate Evaluator'}</span>
+                </div>
+                {hasData && <span className="badge badge-emerald" style={{ fontSize: '0.64rem' }}>Ready</span>}
+              </div>
+
+              {currentUser && (
+                <div
+                  className="mobile-nav-link"
+                  onClick={() => { setMobileMenuOpen(false); onOpenHistory(); }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <History size={17} color="var(--indigo)" />
+                    <span>Audit History</span>
+                  </div>
+                </div>
+              )}
+
+              {hasData && currentView === 'app' && (
+                <div
+                  className="mobile-nav-link"
+                  onClick={() => { setMobileMenuOpen(false); onReset(); }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <RotateCcw size={17} color="var(--rose)" />
+                    <span>Start New Evaluation</span>
+                  </div>
+                </div>
+              )}
+
+              <div
+                className="mobile-nav-link"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  if (currentView !== 'landing') onNavigate('landing');
+                  setTimeout(() => {
+                    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+                  }, 120);
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <Sparkles size={17} color="var(--amber)" />
+                  <span>Features & Methodology</span>
+                </div>
+              </div>
+
+              <div
+                className="mobile-nav-link"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  if (currentView !== 'landing') onNavigate('landing');
+                  setTimeout(() => {
+                    document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+                  }, 120);
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <ShieldCheck size={17} color="var(--emerald)" />
+                  <span>How It Works</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Logout button (if logged in) */}
+            {currentUser && (
+              <button
+                onClick={() => { setMobileMenuOpen(false); onLogout(); }}
+                className="btn-ghost"
+                style={{
+                  width: '100%',
+                  justifyContent: 'center',
+                  color: 'var(--rose)',
+                  background: 'var(--rose-subtle)',
+                  borderRadius: 10,
+                  padding: '10px 14px',
+                  fontWeight: 600,
+                  fontSize: '0.84rem'
+                }}
+              >
+                <LogOut size={16} />
+                <span>Sign Out</span>
+              </button>
+            )}
+
+            {/* Status indicator bar in drawer */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              fontSize: '0.72rem',
+              color: 'var(--text-dim)',
+              paddingTop: 8,
+              borderTop: '1px solid var(--border-subtle)'
+            }}>
+              <div className="glow-dot" style={{
+                background: groqStatus?.groq_active ? 'var(--emerald)' : 'var(--amber)'
+              }} />
+              <span>AI Engine: {groqStatus?.groq_active ? 'Active & High-Speed' : 'Fallback Mode'}</span>
+            </div>
+          </div>
+        </>
+      )}
     </header>
   );
 }

@@ -113,14 +113,14 @@ export default function HistoryModal({ isOpen, onClose, onLoadEvaluation, curren
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '20px'
+      padding: 'clamp(8px, 2vw, 20px)'
     }}>
       <div 
         className="card-solid"
         style={{
           width: '100%',
           maxWidth: 820,
-          maxHeight: '90vh',
+          maxHeight: '94vh',
           display: 'flex',
           flexDirection: 'column',
           backgroundColor: '#ffffff',
@@ -132,7 +132,7 @@ export default function HistoryModal({ isOpen, onClose, onLoadEvaluation, curren
       >
         {/* Header */}
         <div style={{
-          padding: '20px 24px',
+          padding: '16px clamp(14px, 3vw, 24px)',
           borderBottom: '1px solid var(--border-subtle)',
           display: 'flex',
           alignItems: 'center',

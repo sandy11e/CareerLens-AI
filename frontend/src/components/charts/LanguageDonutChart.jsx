@@ -46,7 +46,7 @@ export default function LanguageDonutChart({ repos = [] }) {
     cutout: '68%',
     plugins: {
       legend: {
-        position: 'right',
+        position: 'bottom',
         labels: {
           color: '#334155',
           font: { family: 'Inter', size: 11, weight: '500' },
@@ -70,7 +70,7 @@ export default function LanguageDonutChart({ repos = [] }) {
   };
 
   return (
-    <div style={{ height: 180, position: 'relative' }}>
+    <div style={{ height: 210, position: 'relative' }}>
       <Doughnut data={chartData} options={options} />
     </div>
   );

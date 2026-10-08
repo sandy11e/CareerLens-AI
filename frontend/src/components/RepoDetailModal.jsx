@@ -18,14 +18,14 @@ export default function RepoDetailModal({ repo, username, onClose }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '16px'
+      padding: 'clamp(8px, 2vw, 16px)'
     }} onClick={onClose}>
       <div
         className="card-solid"
         style={{
           maxWidth: 540,
           width: '100%',
-          padding: '28px',
+          padding: 'clamp(18px, 4vw, 28px)',
           background: '#ffffff',
           boxShadow: 'var(--shadow-modal)',
           position: 'relative'

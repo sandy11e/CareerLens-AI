@@ -88,12 +88,12 @@ export default function AuthPage({ initialMode = 'login', onAuthSuccess, onBackH
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '40px 16px'
+      padding: 'clamp(20px, 4vw, 40px) 12px'
     }}>
       <div className="card-solid" style={{
         width: '100%',
         maxWidth: 440,
-        padding: '36px 32px',
+        padding: 'clamp(24px, 5vw, 36px) clamp(16px, 4vw, 32px)',
         boxShadow: 'var(--shadow-md)',
         position: 'relative'
       }}>

@@ -112,11 +112,11 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
               border: `2px dashed ${isDragOver ? 'var(--primary)' : file ? 'var(--emerald)' : 'var(--border-medium)'}`,
               background: isDragOver ? 'var(--primary-subtle)' : file ? 'var(--emerald-subtle)' : 'var(--bg-subtle)',
               borderRadius: 12,
-              padding: '36px 20px',
+              padding: 'clamp(20px, 4vw, 36px) 16px',
               textAlign: 'center',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              marginBottom: 20
+              marginBottom: 16
             }}
           >
             <input
@@ -142,7 +142,7 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
                 }}>
                   <FileCheck size={24} />
                 </div>
-                <div style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-main)' }}>
+                <div style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-main)', wordBreak: 'break-all' }}>
                   {file.name}
                 </div>
                 <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
@@ -181,7 +181,7 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
                   <Upload size={22} />
                 </div>
                 <div>
-                  <div style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-main)', marginBottom: 2 }}>
+                  <div style={{ fontWeight: 600, fontSize: '0.92rem', color: 'var(--text-main)', marginBottom: 2 }}>
                     Click to browse or drag and drop your Resume PDF
                   </div>
                   <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
@@ -195,9 +195,9 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
           {/* Social Profiles Grid */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: 14,
-            marginBottom: 20
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: 12,
+            marginBottom: 18
           }}>
             {/* GitHub Username - Mandatory */}
             <div style={{
@@ -210,7 +210,7 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
               gap: 10
             }}>
               <GithubIcon size={19} color="#334155" />
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
                   <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
                     GitHub Handle *
@@ -222,7 +222,7 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
                 <input
                   type="text"
                   required
-                  placeholder="Enter GitHub username (e.g. sandy11e)"
+                  placeholder="Enter GitHub handle"
                   value={githubUser}
                   onChange={(e) => setGithubUser(e.target.value)}
                   style={{
@@ -252,7 +252,7 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
               gap: 10
             }}>
               <Code size={19} color="#d97706" />
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
                   <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
                     LeetCode Handle *
@@ -264,7 +264,7 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
                 <input
                   type="text"
                   required
-                  placeholder="Enter LeetCode username (e.g. sandy11e)"
+                  placeholder="Enter LeetCode handle"
                   value={leetcodeUser}
                   onChange={(e) => setLeetcodeUser(e.target.value)}
                   style={{
@@ -296,7 +296,7 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
               border: '1px solid var(--rose-border)',
               color: 'var(--rose)',
               fontSize: '0.84rem',
-              marginBottom: 18
+              marginBottom: 16
             }}>
               <AlertCircle size={15} />
               <span>{validationError}</span>
@@ -319,14 +319,20 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
               fontSize: '0.78rem'
             }}>
               <CheckCircle2 size={14} color="var(--emerald)" />
-              <span>Resume and engineering signals analyzed privately & securely</span>
+              <span>Resume and engineering signals analyzed privately</span>
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
               className="btn-primary"
-              style={{ padding: '12px 28px', fontSize: '0.92rem' }}
+              style={{
+                padding: '12px 28px',
+                fontSize: '0.92rem',
+                flexGrow: 1,
+                maxWidth: '100%',
+                minWidth: '220px'
+              }}
             >
               <span>{isLoading ? 'Running Pipeline...' : 'Evaluate Developer Profile'}</span>
               <ArrowRight size={16} />

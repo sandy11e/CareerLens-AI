@@ -610,7 +610,7 @@ export default function JobMatchesSection({ data, onJdMatchUpdate, onRoadmapUpda
                     </p>
 
                     {/* Sub-Score Bars */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12 }}>
                       <div style={{
                         background: '#ffffff',
                         border: '1px solid var(--border-subtle)',
