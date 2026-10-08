@@ -114,7 +114,10 @@ export default function App() {
       }
     } catch (err) {
       console.error('Unified evaluation failed:', err);
-      const detail = err.response?.data?.detail || err.message || 'Evaluation pipeline encountered an unexpected error.';
+      const rawDetail = err.response?.data?.detail;
+      const detail = rawDetail || (err.message === 'Network Error'
+        ? 'Network Error: The backend service may be waking up from sleep or temporarily unreachable. Please click Retry below.'
+        : err.message || 'Evaluation pipeline encountered an unexpected error.');
       setError(detail);
     } finally {
       setIsLoading(false);
