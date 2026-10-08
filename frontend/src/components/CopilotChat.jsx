@@ -68,10 +68,11 @@ const DEFAULT_FOLLOWUPS = [
 ];
 
 const THINKING_STEPS = [
-  'Thinking through your profile...',
-  'Articulating a tailored response...',
-  'Magnifying the key details...',
-  'Connecting the dots across your signals...'
+  'Surveying...',
+  'Correlating...',
+  'Discerning...',
+  'Synthesizing...',
+  'Charting...'
 ];
 
 // Helper: Custom Markdown & Code Formatter
@@ -368,6 +369,7 @@ export default function CopilotChat({ evaluationId, initialContext, historyReset
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [thinkingStep, setThinkingStep] = useState(0);
+  const shownThinkingStepsRef = useRef([]);
   const [copiedMsgIdx, setCopiedMsgIdx] = useState(null);
   const [isListening, setIsListening] = useState(false);
   const [isSpeakingIdx, setIsSpeakingIdx] = useState(null);
@@ -457,10 +459,26 @@ export default function CopilotChat({ evaluationId, initialContext, historyReset
   useEffect(() => {
     if (!isSending) {
       setThinkingStep(0);
+      shownThinkingStepsRef.current = [];
       return undefined;
     }
+
+    const initialStep = Math.floor(Math.random() * THINKING_STEPS.length);
+    shownThinkingStepsRef.current = [initialStep];
+    setThinkingStep(initialStep);
+
     const intervalId = window.setInterval(() => {
-      setThinkingStep((step) => (step + 1) % THINKING_STEPS.length);
+      setThinkingStep((step) => {
+        const availableSteps = THINKING_STEPS
+          .map((_, index) => index)
+          .filter((index) => !shownThinkingStepsRef.current.includes(index));
+
+        if (!availableSteps.length) return step;
+
+        const nextStep = availableSteps[Math.floor(Math.random() * availableSteps.length)];
+        shownThinkingStepsRef.current.push(nextStep);
+        return nextStep;
+      });
     }, 1400);
     return () => window.clearInterval(intervalId);
   }, [isSending]);
@@ -1337,7 +1355,7 @@ export default function CopilotChat({ evaluationId, initialContext, historyReset
             );
           })}
 
-          {/* Multi-step Animated Thinking Indicator */}
+          {/* Multi-stage CareerLens response indicator */}
           {isSending && (
             <div className="chat-message-row bot-row animate-fade-in" style={{ animationDelay: '0s' }}>
               <div style={{
@@ -1360,7 +1378,6 @@ export default function CopilotChat({ evaluationId, initialContext, historyReset
                 </div>
                 <div style={{
                   background: 'var(--bg-surface)',
-                  border: '1px solid var(--border-subtle)',
                   borderRadius: '4px 18px 18px 18px',
                   padding: '16px 20px',
                   display: 'flex',
@@ -1368,20 +1385,13 @@ export default function CopilotChat({ evaluationId, initialContext, historyReset
                   gap: 12,
                   boxShadow: 'var(--shadow-xs)'
                 }}>
-                  <div style={{ display: 'flex', gap: 5 }}>
-                    {[0, 1, 2].map(i => (
-                      <div key={i} style={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: '50%',
-                        background: 'var(--primary)',
-                        opacity: 0.5,
-                        animation: `bounce-subtle 1.2s ease-in-out ${i * 0.2}s infinite`
-                      }} />
+                  <span key={THINKING_STEPS[thinkingStep]} className="copilot-processing-label" style={{ fontSize: '0.84rem' }}>
+                    {THINKING_STEPS[thinkingStep].replace('...', '')}
+                  </span>
+                  <span className="copilot-processing-dots" aria-hidden="true">
+                    {[0, 1, 2].map((dot) => (
+                      <span key={dot} style={{ animationDelay: `${dot * 0.16}s` }}>.</span>
                     ))}
-                  </div>
-                  <span style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
-                    {THINKING_STEPS[thinkingStep]}
                   </span>
                 </div>
               </div>
