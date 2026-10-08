@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, FileCheck, Code, AlertCircle, ArrowRight } from 'lucide-react';
+import { Upload, FileCheck, Code, AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { GithubIcon } from './Icons';
 
 export default function HeroUpload({ onAnalyze, isLoading }) {
