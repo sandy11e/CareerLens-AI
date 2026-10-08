@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Upload, FileCheck, Code, AlertCircle, ArrowRight, CheckCircle2, Shield, Sparkles } from 'lucide-react';
 import { GithubIcon } from './Icons';
+import DnaTechBackground from './DnaTechBackground';
 
 export default function HeroUpload({ onAnalyze, isLoading }) {
   const [file, setFile] = useState(null);
@@ -60,11 +61,24 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
 
   return (
     <div style={{
-      width: '100%',
-      maxWidth: 780,
-      margin: '36px auto 64px',
-      padding: '0 20px'
+      position: 'relative',
+      minHeight: 'calc(100vh - 58px)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '36px 20px 64px',
+      overflow: 'hidden'
     }}>
+      {/* Live 3D Multicolor DNA Tech Background in Empty Space */}
+      <DnaTechBackground opacity={0.65} diagonal={true} glow={true} />
+
+      <div style={{
+        position: 'relative',
+        zIndex: 1,
+        width: '100%',
+        maxWidth: 780,
+        margin: '0 auto'
+      }}>
       {/* Header & Eyebrow */}
       <div style={{ textAlign: 'center', marginBottom: 36 }}>
         <div style={{
@@ -364,5 +378,6 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
         </form>
       </div>
     </div>
+  </div>
   );
 }

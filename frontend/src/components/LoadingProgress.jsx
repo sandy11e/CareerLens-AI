@@ -4,6 +4,7 @@ import {
   Database, Sparkles, Terminal, Cpu, Activity, Zap, 
   FileText, Check, Award, Layers, BarChart2, ShieldAlert
 } from 'lucide-react';
+import DnaTechBackground from './DnaTechBackground';
 
 const STAGES = [
   { 
@@ -127,16 +128,29 @@ export default function LoadingProgress({ uploadProgress = 0 }) {
 
   return (
     <div style={{
-      maxWidth: 780,
-      margin: '40px auto 64px',
-      padding: '0 20px',
-      position: 'relative'
+      position: 'relative',
+      minHeight: 'calc(100vh - 58px)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '40px 20px 64px',
+      overflow: 'hidden'
     }}>
-      {/* Main Container Card */}
+      {/* Live 3D Multicolor DNA Tech Background in Empty Space */}
+      <DnaTechBackground opacity={0.65} diagonal={true} glow={true} />
+
       <div style={{
+        maxWidth: 780,
+        width: '100%',
+        margin: '0 auto',
         position: 'relative',
-        background: 'var(--bg-surface)',
-        border: '1px solid var(--border-subtle)',
+        zIndex: 1
+      }}>
+        {/* Main Container Card */}
+        <div style={{
+          position: 'relative',
+          background: 'var(--bg-surface)',
+          border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--radius-lg)',
         boxShadow: 'var(--shadow-md)',
         padding: '36px 36px 32px'
@@ -676,5 +690,6 @@ export default function LoadingProgress({ uploadProgress = 0 }) {
         </div>
       </div>
     </div>
+  </div>
   );
 }

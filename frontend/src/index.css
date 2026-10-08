@@ -1009,8 +1009,9 @@ textarea::placeholder {
 }
 
 .chat-input-area {
-  padding: 16px 24px 24px;
-  background: var(--bg-surface);
+  padding: 12px 24px 20px;
+  background: transparent;
+  border: none;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1043,13 +1044,11 @@ textarea::placeholder {
 }
 
 .chat-send-btn {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
+  position: relative;
   width: 36px;
   height: 36px;
-  border-radius: 50%;
-  background: var(--text-main);
+  border-radius: 10px;
+  background: var(--primary);
   color: white;
   border: none;
   cursor: pointer;
@@ -1057,6 +1056,7 @@ textarea::placeholder {
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .chat-send-btn:hover:not(:disabled) {
@@ -1861,9 +1861,9 @@ textarea::placeholder {
 
 /* Input Area */
 .chat-input-area {
-  padding: 14px clamp(12px, 3vw, 28px) 18px;
-  background: var(--bg-surface);
-  border-top: 1px solid var(--border-subtle);
+  padding: 12px clamp(12px, 3vw, 28px) 20px;
+  background: transparent;
+  border-top: none;
   position: relative;
   z-index: 10;
 }
@@ -2045,8 +2045,8 @@ textarea::placeholder {
 }
 
 [data-theme="dark"] .chat-input-area {
-  background: #141210 !important;
-  border-color: #261f18 !important;
+  background: transparent !important;
+  border: none !important;
 }
 
 [data-theme="dark"] .chat-bubble-bot {

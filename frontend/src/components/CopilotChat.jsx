@@ -1343,72 +1343,40 @@ export default function CopilotChat({ evaluationId, initialContext }) {
         </div>
 
         {/* ==================== COMPOSER INPUT DOCK ==================== */}
-        <div className="chat-input-area">
-          {/* Scope Focus Selector Pill */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: 8,
-            padding: '0 4px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflowX: 'auto' }}>
-              <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-dim)' }}>
-                Scope:
-              </span>
-              {[
-                { id: '360', label: '🌐 360° Profile' },
-                { id: 'resume', label: '📄 Resume Only' },
-                { id: 'github', label: '💻 GitHub & Code' },
-                { id: 'interview', label: '🎯 Interview Mode' },
-              ].map(scope => (
-                <button
-                  key={scope.id}
-                  onClick={() => setFocusScope(scope.id)}
-                  style={{
-                    padding: '3px 9px',
-                    borderRadius: 12,
-                    fontSize: '0.72rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                    border: focusScope === scope.id ? '1px solid var(--primary)' : '1px solid var(--border-subtle)',
-                    background: focusScope === scope.id ? 'var(--primary-subtle)' : 'var(--bg-subtle)',
-                    color: focusScope === scope.id ? 'var(--primary)' : 'var(--text-secondary)'
-                  }}
-                >
-                  {scope.label}
-                </button>
-              ))}
-            </div>
-
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }} className="hide-on-mobile">
-              Press <kbd style={{ padding: '1px 5px', borderRadius: 4, background: 'var(--bg-muted)', fontSize: '0.68rem', border: '1px solid var(--border-medium)' }}>Enter ↵</kbd> to send
-            </span>
-          </div>
-
+        <div className="chat-input-area" style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '100%',
+          padding: '12px 24px 20px',
+          boxSizing: 'border-box',
+          background: 'transparent',
+          border: 'none',
+          boxShadow: 'none'
+        }}>
           {/* Composer Input Box */}
-          <div className="chat-input-wrapper">
+          <div className="chat-input-wrapper" style={{ margin: '0 auto', width: '100%', maxWidth: 800, position: 'relative' }}>
             <textarea
               ref={textareaRef}
               className="chat-input-box"
-              placeholder={isListening ? '🎙️ Listening to your voice query...' : `Ask anything about your resume, GitHub projects, or ${targetRole} prep...`}
+              placeholder={isListening ? '🎙️ Listening to your voice query...' : `Ask anything `}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               disabled={isSending}
               rows={1}
-              style={{ paddingRight: voiceSupported ? 100 : 54 }}
+              style={{ paddingRight: voiceSupported ? (input ? 124 : 96) : (input ? 84 : 52) }}
             />
 
             {/* Dock Actions: Clear, Mic, Send */}
             <div style={{
               position: 'absolute',
-              right: 10,
-              bottom: 8,
+              right: 8,
+              bottom: 7,
               display: 'flex',
               alignItems: 'center',
-              gap: 6
+              gap: 6,
+              zIndex: 3
             }}>
               {/* Voice recognition active sound wave */}
               {isListening && (
@@ -1431,7 +1399,8 @@ export default function CopilotChat({ evaluationId, initialContext }) {
                     padding: 4,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    flexShrink: 0
                   }}
                   title="Clear input"
                 >
@@ -1446,16 +1415,18 @@ export default function CopilotChat({ evaluationId, initialContext }) {
                   style={{
                     width: 34,
                     height: 34,
+                    minWidth: 34,
                     borderRadius: 10,
-                    border: 'none',
-                    background: isListening ? 'var(--rose-subtle)' : 'var(--bg-subtle)',
+                    border: '1px solid var(--border-subtle)',
+                    background: isListening ? 'var(--rose-subtle)' : 'var(--bg-surface)',
                     color: isListening ? 'var(--rose)' : 'var(--text-muted)',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     transition: 'all 0.2s ease',
-                    boxShadow: isListening ? '0 0 12px var(--rose)' : 'none'
+                    boxShadow: isListening ? '0 0 12px var(--rose)' : 'var(--shadow-xs)',
+                    flexShrink: 0
                   }}
                   title={isListening ? 'Stop recording' : 'Voice input'}
                 >
@@ -1464,11 +1435,24 @@ export default function CopilotChat({ evaluationId, initialContext }) {
               )}
 
               <button
+                type="button"
                 onClick={() => handleSend()}
                 disabled={!input.trim() || isSending}
                 className="chat-send-btn"
                 style={{
-                  background: input.trim() ? 'var(--gradient-accent)' : 'var(--border-medium)',
+                  position: 'relative',
+                  width: 34,
+                  height: 34,
+                  minWidth: 34,
+                  flexShrink: 0,
+                  margin: 0,
+                  borderRadius: 10,
+                  background: input.trim() ? 'var(--primary)' : 'var(--border-medium)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: !input.trim() || isSending ? 'not-allowed' : 'pointer',
+                  boxShadow: input.trim() ? 'var(--shadow-sm)' : 'none'
                 }}
                 title="Send query"
               >
@@ -1488,9 +1472,9 @@ export default function CopilotChat({ evaluationId, initialContext }) {
             gap: 6
           }}>
             <Sparkles size={11} color="var(--primary)" />
-            <span>Context-aware AI strictly scoped to your verified technical portfolio & career trajectory.</span>
           </div>
         </div>
+
       </main>
 
       {/* ==================== CONTEXT SNAPSHOT MODAL ==================== */}

@@ -4,6 +4,7 @@ import {
   CheckCircle2, AlertCircle, ArrowLeft, Shield 
 } from 'lucide-react';
 import api from '../api';
+import DnaTechBackground from './DnaTechBackground';
 
 export default function AuthPage({ initialMode = 'login', onAuthSuccess, onBackHome }) {
   const [mode, setMode] = useState(initialMode); // 'login' | 'register'
@@ -84,18 +85,27 @@ export default function AuthPage({ initialMode = 'login', onAuthSuccess, onBackH
 
   return (
     <div style={{
-      minHeight: '80vh',
+      position: 'relative',
+      minHeight: 'calc(100vh - 58px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: 'clamp(20px, 4vw, 40px) 12px'
+      padding: 'clamp(24px, 4vw, 40px) 16px',
+      overflow: 'hidden'
     }}>
+      {/* Live 3D Multicolor DNA Tech Background Animation */}
+      <DnaTechBackground opacity={0.88} diagonal={false} glow={true} />
+
+      {/* Main Centered Auth Card */}
       <div className="card-solid" style={{
         width: '100%',
         maxWidth: 440,
-        padding: 'clamp(24px, 5vw, 36px) clamp(16px, 4vw, 32px)',
+        padding: 'clamp(28px, 5vw, 40px) clamp(20px, 4vw, 34px)',
         boxShadow: 'var(--shadow-md)',
-        position: 'relative'
+        position: 'relative',
+        zIndex: 1,
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)'
       }}>
         {/* Back navigation */}
         <button
@@ -112,8 +122,11 @@ export default function AuthPage({ initialMode = 'login', onAuthSuccess, onBackH
             gap: 4,
             cursor: 'pointer',
             fontSize: '0.8rem',
-            fontWeight: 500
+            fontWeight: 600,
+            transition: 'color 0.15s ease'
           }}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-main)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
         >
           <ArrowLeft size={14} />
           <span>Back</span>
@@ -125,20 +138,21 @@ export default function AuthPage({ initialMode = 'login', onAuthSuccess, onBackH
             width: 44,
             height: 44,
             borderRadius: 12,
-            background: 'var(--text-main)',
+            background: 'var(--primary)',
             color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            margin: '0 auto 12px auto'
+            margin: '0 auto 12px auto',
+            boxShadow: 'var(--shadow-sm)'
           }}>
             <Code2 size={24} />
           </div>
 
-          <h2 className="font-display" style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)' }}>
+          <h2 className="font-display" style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
             {mode === 'login' ? 'Welcome Back' : 'Create an Account'}
           </h2>
-          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: 4 }}>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: 6, lineHeight: 1.4 }}>
             {mode === 'login' 
               ? 'Sign in to access your saved audits and career metrics' 
               : 'Join Devlyzer AI to save profile evaluations and track progress'}
@@ -161,8 +175,8 @@ export default function AuthPage({ initialMode = 'login', onAuthSuccess, onBackH
             style={{
               padding: '8px 12px',
               borderRadius: 7,
-              border: mode === 'login' ? '1px solid var(--border-medium)' : 'none',
-              background: mode === 'login' ? '#ffffff' : 'transparent',
+              border: mode === 'login' ? '1px solid var(--border-medium)' : '1px solid transparent',
+              background: mode === 'login' ? 'var(--card-bg)' : 'transparent',
               color: mode === 'login' ? 'var(--text-main)' : 'var(--text-muted)',
               fontWeight: mode === 'login' ? 700 : 500,
               fontSize: '0.84rem',
@@ -179,8 +193,8 @@ export default function AuthPage({ initialMode = 'login', onAuthSuccess, onBackH
             style={{
               padding: '8px 12px',
               borderRadius: 7,
-              border: mode === 'register' ? '1px solid var(--border-medium)' : 'none',
-              background: mode === 'register' ? '#ffffff' : 'transparent',
+              border: mode === 'register' ? '1px solid var(--border-medium)' : '1px solid transparent',
+              background: mode === 'register' ? 'var(--card-bg)' : 'transparent',
               color: mode === 'register' ? 'var(--text-main)' : 'var(--text-muted)',
               fontWeight: mode === 'register' ? 700 : 500,
               fontSize: '0.84rem',
@@ -196,9 +210,9 @@ export default function AuthPage({ initialMode = 'login', onAuthSuccess, onBackH
         {/* Feedback Alerts */}
         {error && (
           <div style={{
-            background: '#fff5f5',
-            border: '1px solid #fed7d7',
-            color: '#c53030',
+            background: 'var(--rose-subtle)',
+            border: '1px solid var(--rose-border)',
+            color: 'var(--rose)',
             padding: '10px 14px',
             borderRadius: 8,
             fontSize: '0.82rem',
@@ -214,9 +228,9 @@ export default function AuthPage({ initialMode = 'login', onAuthSuccess, onBackH
 
         {successMsg && (
           <div style={{
-            background: '#f0fdf4',
-            border: '1px solid #bbf7d0',
-            color: '#15803d',
+            background: 'var(--emerald-subtle)',
+            border: '1px solid var(--emerald-border)',
+            color: 'var(--emerald)',
             padding: '10px 14px',
             borderRadius: 8,
             fontSize: '0.82rem',
@@ -249,6 +263,7 @@ export default function AuthPage({ initialMode = 'login', onAuthSuccess, onBackH
                     padding: '10px 12px 10px 36px',
                     borderRadius: 8,
                     border: '1px solid var(--border-medium)',
+                    background: 'var(--card-bg)',
                     fontSize: '0.88rem',
                     color: 'var(--text-main)',
                     boxSizing: 'border-box'
@@ -274,6 +289,7 @@ export default function AuthPage({ initialMode = 'login', onAuthSuccess, onBackH
                   padding: '10px 12px 10px 36px',
                   borderRadius: 8,
                   border: '1px solid var(--border-medium)',
+                  background: 'var(--card-bg)',
                   fontSize: '0.88rem',
                   color: 'var(--text-main)',
                   boxSizing: 'border-box'
@@ -298,6 +314,7 @@ export default function AuthPage({ initialMode = 'login', onAuthSuccess, onBackH
                   padding: '10px 38px 10px 36px',
                   borderRadius: 8,
                   border: '1px solid var(--border-medium)',
+                  background: 'var(--card-bg)',
                   fontSize: '0.88rem',
                   color: 'var(--text-main)',
                   boxSizing: 'border-box'
@@ -338,6 +355,7 @@ export default function AuthPage({ initialMode = 'login', onAuthSuccess, onBackH
                     padding: '10px 12px 10px 36px',
                     borderRadius: 8,
                     border: '1px solid var(--border-medium)',
+                    background: 'var(--card-bg)',
                     fontSize: '0.88rem',
                     color: 'var(--text-main)',
                     boxSizing: 'border-box'
