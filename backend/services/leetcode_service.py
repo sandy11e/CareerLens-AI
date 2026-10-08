@@ -57,11 +57,11 @@ def extract_leetcode_features(username: str):
 
     user = data["data"]["matchedUser"]
 
-    ac_stats = user.get("submitStats", {}).get("acSubmissionNum", [])
-    total_stats = user.get("submitStats", {}).get("totalSubmissionNum", [])
+    ac_stats = (user.get("submitStats") or {}).get("acSubmissionNum") or []
+    total_stats = (user.get("submitStats") or {}).get("totalSubmissionNum") or []
 
-    difficulty_map = {item["difficulty"]: item["count"] for item in ac_stats}
-    total_map = {item["difficulty"]: item["count"] for item in total_stats}
+    difficulty_map = {item["difficulty"]: item["count"] for item in ac_stats if isinstance(item, dict) and "difficulty" in item}
+    total_map = {item["difficulty"]: item["count"] for item in total_stats if isinstance(item, dict) and "difficulty" in item}
 
     easy = difficulty_map.get("Easy", 0)
     medium = difficulty_map.get("Medium", 0)
@@ -75,8 +75,8 @@ def extract_leetcode_features(username: str):
         if total_submissions > 0 else 0.0
     )
 
-    ranking = user.get("profile", {}).get("ranking", 0)
-    avatar = user.get("profile", {}).get("userAvatar", "")
+    ranking = (user.get("profile") or {}).get("ranking", 0)
+    avatar = (user.get("profile") or {}).get("userAvatar", "")
 
     return {
         "username": user.get("username", username),

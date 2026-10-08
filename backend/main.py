@@ -90,10 +90,26 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 # In-memory sessions cache for quick access
 active_sessions: Dict[str, Dict[str, Any]] = {}
 
+def _keep_alive_ping_worker():
+    """Background daemon that pings the Render backend every 10 minutes to prevent sleep."""
+    import time
+    time.sleep(60)  # Wait 1 minute after boot
+    render_url = os.getenv("RENDER_EXTERNAL_URL") or "https://devlyzer-ai.onrender.com"
+    while True:
+        try:
+            import requests
+            resp = requests.get(f"{render_url}/api/health", timeout=25)
+            logger.info(f"10-Minute Keep-Alive Heartbeat sent to {render_url} (HTTP {resp.status_code})")
+        except Exception as e:
+            logger.warning(f"Keep-alive ping note: {e}")
+        time.sleep(600)  # Exactly every 10 minutes
+
 @app.on_event("startup")
 def startup_event():
     logger.info("Initializing CareerLens AI backend...")
     connect_db()
+    import threading
+    threading.Thread(target=_keep_alive_ping_worker, daemon=True).start()
 
 @app.get("/")
 def root():
@@ -372,8 +388,9 @@ async def evaluate_unified_profile(
 
     # Auto-detect GitHub username from resume if not provided
     effective_github = github_username
-    if not effective_github and resume_analysis.get("candidate_info", {}).get("github"):
-        effective_github = resume_analysis["candidate_info"]["github"]
+    cand_info_extracted = (resume_analysis or {}).get("candidate_info") or {}
+    if not effective_github and cand_info_extracted.get("github"):
+        effective_github = cand_info_extracted["github"]
 
     # 2. Evaluate GitHub Signals if available
     github_signals = None

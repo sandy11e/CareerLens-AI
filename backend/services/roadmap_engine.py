@@ -93,12 +93,12 @@ def generate_personalized_roadmap(candidate_context: Dict[str, Any], target_role
 
     missing_str = ", ".join(missing_skills[:4])
 
-    cross_ver = candidate_context.get("cross_verification", {})
-    unverified = ", ".join([u["skill"] for u in cross_ver.get("unverified_skills", [])[:3]])
+    cross_ver = candidate_context.get("cross_verification") or {}
+    unverified = ", ".join([u.get("skill", "") for u in (cross_ver.get("unverified_skills") or [])[:3] if isinstance(u, dict)])
     
     gh = candidate_context.get("github_signals") or {}
     lc = candidate_context.get("leetcode_signals") or {}
-    ats_score = candidate_context.get("scores", {}).get("ats_compatibility", 70)
+    ats_score = (candidate_context.get("scores") or {}).get("ats_compatibility", 70)
 
     if is_groq_configured():
         try:

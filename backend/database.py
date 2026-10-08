@@ -189,8 +189,8 @@ def save_full_evaluation(user_id: str, record: dict):
         "user_id": user_id,
         "candidate_name": cand_info.get("name") or record.get("candidate_name") or "Candidate",
         "headline": record.get("headline", "Software Developer"),
-        "github_username": cand_info.get("github") or record.get("github_signals", {}).get("login", ""),
-        "leetcode_username": record.get("leetcode_signals", {}).get("username", ""),
+        "github_username": cand_info.get("github") or (record.get("github_signals") or {}).get("username") or (record.get("github_signals") or {}).get("login", ""),
+        "leetcode_username": (record.get("leetcode_signals") or {}).get("username", ""),
         "target_role": record.get("target_role", "Software Engineer"),
         "holistic_score": record.get("holistic_score", 0),
         "resume_overall_score": record.get("resume_overall_score", 0),
@@ -340,7 +340,7 @@ def get_chat_history(user_id: str, limit: int = 50):
         except Exception as e:
             logger.error(f"Error reading chat history from MongoDB: {e}")
     
-    return memory_store.get("conversations", {}).get(user_id, [])[-limit:]
+    return (memory_store.get("conversations") or {}).get(user_id, [])[-limit:]
 
 def clear_chat_history(user_id: str):
     if not user_id:
