@@ -130,7 +130,12 @@ export default function App() {
   };
 
   const handleStartAudit = () => {
-    setCurrentView('app');
+    if (currentUser) {
+      setCurrentView('app');
+    } else {
+      setAuthMode('register');
+      setCurrentView('auth');
+    }
   };
 
   const handleOpenAuth = (mode = 'login') => {
@@ -147,14 +152,30 @@ export default function App() {
   const handleLogout = () => {
     api.logout();
     setCurrentUser(null);
+    setCurrentView('landing');
   };
+
+  // Guard: require authentication for the application analysis page
+  useEffect(() => {
+    if (currentView === 'app' && !currentUser) {
+      setAuthMode('login');
+      setCurrentView('auth');
+    }
+  }, [currentView, currentUser]);
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Top Navigation */}
       <Navbar
         currentView={currentView}
-        onNavigate={setCurrentView}
+        onNavigate={(view) => {
+          if (view === 'app' && !currentUser) {
+            setAuthMode('login');
+            setCurrentView('auth');
+          } else {
+            setCurrentView(view);
+          }
+        }}
         currentUser={currentUser}
         onLogout={handleLogout}
         onOpenAuth={handleOpenAuth}
@@ -167,27 +188,15 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="app-main-container">
-        {/* VIEW 1: LANDING PAGE */}
+        {/* VIEW 1: DEDICATED LANDING PAGE */}
         {currentView === 'landing' && (
-          <>
-            {isLoading && (
-              <div style={{ marginBottom: 24 }}>
-                <LoadingProgress uploadProgress={uploadProgress} />
-              </div>
-            )}
-            {!isLoading && error && (
-              <div style={{ marginBottom: 24 }}>
-                <ErrorAlert error={error} onRetry={() => lastParams && handleAnalyze(lastParams)} />
-              </div>
-            )}
-            <LandingPage
-              onAnalyze={handleAnalyze}
-              isLoading={isLoading}
-              onOpenAuth={handleOpenAuth}
-              hasData={!!analysisData}
-              onViewDashboard={() => setCurrentView('app')}
-            />
-          </>
+          <LandingPage
+            onStartAudit={handleStartAudit}
+            onOpenAuth={handleOpenAuth}
+            hasData={!!analysisData}
+            onViewDashboard={() => setCurrentView('app')}
+            currentUser={currentUser}
+          />
         )}
 
         {/* VIEW 2: AUTHENTICATION PAGE (LOGIN / REGISTER) */}

@@ -105,7 +105,7 @@ export default function Navbar({
                 fontSize: '0.78rem',
                 cursor: 'pointer'
               }}
-              title="Return to Home Landing"
+              title="Return to Landing Page"
             >
               <Home size={14} />
               <span>Home</span>
@@ -191,31 +191,18 @@ export default function Navbar({
             >
               How It Works
             </button>
-            <button
-              onClick={() => handleScroll('evaluator-portal')}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                padding: '7px 12px',
-                borderRadius: 8,
-                fontSize: '0.82rem',
-                fontWeight: 600,
-                color: 'var(--primary)',
-                cursor: 'pointer'
-              }}
-            >
-              Audit Profile
-            </button>
-            {hasData && (
+
+            {/* If logged in, show link to Main Application */}
+            {currentUser && (
               <button
                 onClick={() => onNavigate('app')}
                 style={{
-                  background: 'rgba(37, 99, 235, 0.1)',
-                  border: '1px solid rgba(37, 99, 235, 0.25)',
-                  padding: '5px 12px',
+                  background: currentView === 'app' ? 'var(--bg-subtle)' : 'transparent',
+                  border: 'none',
+                  padding: '7px 12px',
                   borderRadius: 8,
-                  fontSize: '0.78rem',
-                  fontWeight: 700,
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
                   color: 'var(--primary)',
                   cursor: 'pointer',
                   display: 'inline-flex',
@@ -223,8 +210,8 @@ export default function Navbar({
                   gap: 5
                 }}
               >
-                <Layers size={13} />
-                <span>Active Dashboard</span>
+                <Layers size={14} />
+                <span>{hasData ? 'Active Dashboard' : 'Profile Evaluator'}</span>
               </button>
             )}
           </nav>
@@ -310,7 +297,7 @@ export default function Navbar({
                 className="btn-primary hide-on-mobile"
                 style={{ padding: '6px 14px', fontSize: '0.82rem' }}
               >
-                Register
+                Get Started
               </button>
             </div>
           )}

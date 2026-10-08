@@ -1,25 +1,18 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { 
   ArrowRight, ShieldCheck, Code2, FileText, Briefcase, 
   Sparkles, CheckCircle2, ChevronRight, BarChart3, Award,
   Terminal, Zap, Compass, Users, Lock, Star, ExternalLink, Check
 } from 'lucide-react';
 import { GithubIcon, LeetCodeIcon } from './Icons';
-import HeroUpload from './HeroUpload';
 
 export default function LandingPage({ 
-  onAnalyze, 
-  isLoading, 
+  onStartAudit, 
   onOpenAuth, 
   hasData, 
-  onViewDashboard 
+  onViewDashboard,
+  currentUser 
 }) {
-  const evaluatorRef = useRef(null);
-
-  const scrollToEvaluator = () => {
-    evaluatorRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   const features = [
     {
       icon: FileText,
@@ -62,24 +55,24 @@ export default function LandingPage({
   const steps = [
     {
       num: '01',
-      title: 'Upload & Connect',
-      desc: 'Upload your PDF resume and input your GitHub and LeetCode handles. No target role required upfront.'
+      title: 'Create Account & Sign In',
+      desc: 'Register with your email to create a secure workspace backed by your candidate profile history.'
     },
     {
       num: '02',
-      title: 'Multi-Signal AI Audit',
-      desc: 'Our pipeline extracts skills, evaluates ATS compliance, queries live dev APIs, and cross-verifies claims.'
+      title: 'Connect Resume & Handles',
+      desc: 'Upload your PDF resume and connect your GitHub and LeetCode handles. No target role required upfront.'
     },
     {
       num: '03',
-      title: 'Unlock Career Intelligence',
-      desc: 'Explore your 360° dashboard, match custom job descriptions, and chat with your dedicated AI Career Copilot.'
+      title: 'Unlock 360° Intelligence',
+      desc: 'Access your ATS audit, verified code proof, custom JD match results, and conversational AI Career Copilot.'
     }
   ];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 64, paddingBottom: 60 }}>
-      {/* Active Evaluation Banner if hasData */}
+      {/* Active Evaluation Banner if user has loaded data */}
       {hasData && (
         <div style={{
           background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(16, 185, 129, 0.08) 100%)',
@@ -108,10 +101,10 @@ export default function LandingPage({
             </div>
             <div>
               <div style={{ fontWeight: 800, fontSize: '0.98rem', color: 'var(--text-main)' }}>
-                Active Evaluation Report Loaded
+                Active Candidate Report Loaded
               </div>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Your 360° candidate report, ATS breakdown, code verification, and custom JD matches are ready.
+                Your 360° candidate report, ATS breakdown, code verification, and custom JD matches are available.
               </div>
             </div>
           </div>
@@ -129,7 +122,7 @@ export default function LandingPage({
       {/* Hero Section */}
       <section style={{
         position: 'relative',
-        padding: '48px 24px 24px 24px',
+        padding: '56px 24px 32px 24px',
         textAlign: 'center',
         display: 'flex',
         flexDirection: 'column',
@@ -169,7 +162,7 @@ export default function LandingPage({
           backdropFilter: 'blur(8px)'
         }}>
           <Sparkles size={14} color="var(--primary)" />
-          <span>Next-Gen 360° Developer Evaluation Platform</span>
+          <span>Professional 360° Developer Profile Evaluation</span>
           <span style={{ color: 'var(--border-medium)' }}>•</span>
           <span style={{ color: 'var(--text-secondary)' }}>Resume + GitHub + LeetCode</span>
         </div>
@@ -215,7 +208,7 @@ export default function LandingPage({
           marginBottom: 48
         }}>
           <button
-            onClick={scrollToEvaluator}
+            onClick={onStartAudit}
             className="btn-primary"
             style={{
               padding: '14px 32px',
@@ -224,21 +217,23 @@ export default function LandingPage({
               boxShadow: '0 8px 24px rgba(37, 99, 235, 0.25)'
             }}
           >
-            <span>Start Free Profile Audit</span>
+            <span>{currentUser ? 'Go to Profile Evaluator' : 'Get Started'}</span>
             <ArrowRight size={18} />
           </button>
 
-          <button
-            onClick={() => onOpenAuth('register')}
-            className="btn-secondary"
-            style={{
-              padding: '14px 28px',
-              fontSize: '0.96rem',
-              fontWeight: 600
-            }}
-          >
-            <span>Create Free Account</span>
-          </button>
+          {!currentUser && (
+            <button
+              onClick={() => onOpenAuth('login')}
+              className="btn-secondary"
+              style={{
+                padding: '14px 28px',
+                fontSize: '0.96rem',
+                fontWeight: 600
+              }}
+            >
+              <span>Sign In</span>
+            </button>
+          )}
         </div>
 
         {/* Trust & Signal Badges */}
@@ -255,7 +250,7 @@ export default function LandingPage({
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <CheckCircle2 size={16} color="var(--emerald)" />
-            <span>Zero Target Role Needed Upfront</span>
+            <span>Authenticated Workspace</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <CheckCircle2 size={16} color="var(--emerald)" />
@@ -336,34 +331,6 @@ export default function LandingPage({
         </div>
       </section>
 
-      {/* CORE INTEGRATION: EMBEDDED EVALUATOR PORTAL */}
-      <section 
-        id="evaluator-portal" 
-        ref={evaluatorRef} 
-        style={{ 
-          maxWidth: 820, 
-          margin: '0 auto', 
-          width: '100%', 
-          padding: '0 20px',
-          scrollMarginTop: 90
-        }}
-      >
-        <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <span className="badge badge-blue" style={{ fontSize: '0.8rem', marginBottom: 10 }}>
-            Unified Evaluation Portal
-          </span>
-          <h2 className="font-display" style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
-            Audit Your Profile Now
-          </h2>
-          <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: 4 }}>
-            Upload your resume and enter your developer handles to generate your holistic 360° evaluation.
-          </p>
-        </div>
-
-        {/* Embedded Upload Component */}
-        <HeroUpload onAnalyze={onAnalyze} isLoading={isLoading} />
-      </section>
-
       {/* Core Capabilities Grid */}
       <section id="features" style={{ maxWidth: 1120, margin: '0 auto', width: '100%', padding: '0 20px', scrollMarginTop: 90 }}>
         <div style={{ textAlign: 'center', marginBottom: 44 }}>
@@ -374,7 +341,7 @@ export default function LandingPage({
             Engineered For Modern Software Engineers
           </h2>
           <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', maxWidth: 600, margin: '8px auto 0 auto' }}>
-            Everything you need to audit your application materials, uncover skill gaps, and land interviews with confidence.
+            Everything you need to audit your application materials, uncover skill gaps, and prepare for interviews with confidence.
           </p>
         </div>
 
@@ -434,10 +401,10 @@ export default function LandingPage({
       }}>
         <div style={{ maxWidth: 1040, margin: '0 auto', textAlign: 'center' }}>
           <span className="badge badge-blue" style={{ fontSize: '0.78rem', marginBottom: 12 }}>
-            Fast & Deterministic Pipeline
+            Secure & Systematic Workflow
           </span>
           <h2 className="font-display" style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: 40 }}>
-            How CareerLens Evaluates Your Profile in Seconds
+            How CareerLens Evaluates Your Profile
           </h2>
 
           <div style={{
@@ -521,12 +488,12 @@ export default function LandingPage({
             Ready To Evaluate Your Developer Profile?
           </h2>
           <p style={{ fontSize: '0.95rem', color: 'rgba(255, 255, 255, 0.8)', maxWidth: 600, lineHeight: 1.6, marginBottom: 28 }}>
-            Join software engineers using CareerLens AI to audit their resumes, benchmark GitHub repositories, and prepare for interviews.
+            Create an account to benchmark your resume, audit your GitHub repositories, and prepare for interviews.
           </p>
 
           <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center' }}>
             <button
-              onClick={scrollToEvaluator}
+              onClick={onStartAudit}
               className="btn-primary"
               style={{
                 background: '#ffffff',
@@ -536,25 +503,27 @@ export default function LandingPage({
                 fontWeight: 700
               }}
             >
-              <span>Audit Profile Now</span>
+              <span>{currentUser ? 'Launch Evaluator' : 'Get Started'}</span>
               <ArrowRight size={17} color="var(--text-main)" />
             </button>
 
-            <button
-              onClick={() => onOpenAuth('login')}
-              style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.25)',
-                color: '#ffffff',
-                padding: '13px 26px',
-                borderRadius: 9,
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                cursor: 'pointer'
-              }}
-            >
-              <span>Sign In to Account</span>
-            </button>
+            {!currentUser && (
+              <button
+                onClick={() => onOpenAuth('login')}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                  color: '#ffffff',
+                  padding: '13px 26px',
+                  borderRadius: 9,
+                  fontSize: '0.95rem',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                <span>Sign In</span>
+              </button>
+            )}
           </div>
         </div>
       </section>

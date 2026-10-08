@@ -359,12 +359,12 @@ export default function AuthPage({ initialMode = 'login', onAuthSuccess, onBackH
               marginTop: 6
             }}
           >
-            <span>{isLoading ? 'Processing...' : (mode === 'login' ? 'Sign In' : 'Create Free Account')}</span>
+            <span>{isLoading ? 'Processing...' : (mode === 'login' ? 'Sign In' : 'Create Account')}</span>
             <ArrowRight size={16} />
           </button>
         </form>
 
-        {/* Footer switch & Guest link */}
+        {/* Footer switch */}
         <div style={{ textAlign: 'center', marginTop: 22, paddingTop: 18, borderTop: '1px solid var(--border-subtle)' }}>
           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
             {mode === 'login' ? (
@@ -391,22 +391,6 @@ export default function AuthPage({ initialMode = 'login', onAuthSuccess, onBackH
               </>
             )}
           </div>
-
-          <button
-            type="button"
-            onClick={onBackHome}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--text-secondary)',
-              fontSize: '0.78rem',
-              marginTop: 10,
-              cursor: 'pointer',
-              textDecoration: 'underline'
-            }}
-          >
-            Continue as Guest / Evaluate without logging in
-          </button>
         </div>
       </div>
     </div>
