@@ -394,7 +394,6 @@ async def evaluate_unified_profile(
 
     # 2. Evaluate GitHub Signals if available
     github_signals = None
-    github_error = None
     github_raw = None
     eng_score = 0
     collab_score = 0
@@ -429,15 +428,8 @@ async def evaluate_unified_profile(
                         for r in github_raw.get("repos", [])[:15]
                     ]
                 }
-            else:
-                github_error = (
-                    f"Could not load GitHub profile for '{effective_github}'. "
-                    "Check the username or profile URL. If it is correct, the backend may have "
-                    "hit GitHub's unauthenticated API rate limit; configure GITHUB_TOKEN and retry."
-                )
         except Exception as e:
             logger.warning(f"Failed to fetch GitHub for {effective_github}: {e}")
-            github_error = f"GitHub data could not be loaded: {e}"
 
     # 3. Evaluate LeetCode Signals if available
     leetcode_signals = None
@@ -525,7 +517,6 @@ async def evaluate_unified_profile(
             "category": readiness["category"]
         },
         "github_signals": github_signals,
-        "github_error": github_error,
         "leetcode_signals": leetcode_signals,
         "target_role": target_role,
         "cross_verification": cross_verification,
