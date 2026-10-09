@@ -1,9 +1,29 @@
 import requests
 import logging
+from urllib.parse import unquote, urlsplit
 from config import GITHUB_TOKEN
 
 logger = logging.getLogger("careerlens.github")
 GITHUB_API = "https://api.github.com/users/"
+
+def normalize_github_username(username: str) -> str:
+    value = username.strip()
+    if not value:
+        return ""
+
+    if value.startswith("@"):
+        value = value[1:]
+
+    if "://" in value:
+        parsed = urlsplit(value)
+        if parsed.netloc.lower() in {"github.com", "www.github.com"}:
+            value = parsed.path
+    elif value.lower().startswith(("github.com/", "www.github.com/")):
+        value = value.split("/", 1)[1]
+
+    value = unquote(value).strip("/")
+    value = value.split("/", 1)[0].split("?", 1)[0].split("#", 1)[0]
+    return value.lstrip("@").strip()
 
 def get_headers():
     headers = {"Accept": "application/vnd.github.v3+json"}
@@ -12,12 +32,17 @@ def get_headers():
     return headers
 
 def get_github_profile(username: str):
-    clean_user = username.strip().replace("https://github.com/", "").replace("/", "")
+    clean_user = normalize_github_username(username)
     url = f"{GITHUB_API}{clean_user}"
     try:
         response = requests.get(url, headers=get_headers(), timeout=10)
         if response.status_code != 200:
-            logger.warning(f"GitHub user {clean_user} lookup returned {response.status_code}")
+            logger.warning(
+                "GitHub user %s lookup returned %s (rate-limit remaining: %s)",
+                clean_user,
+                response.status_code,
+                response.headers.get("X-RateLimit-Remaining", "unknown"),
+            )
             return None
         return response.json()
     except Exception as e:
@@ -25,11 +50,17 @@ def get_github_profile(username: str):
         return None
 
 def get_user_repos(username: str):
-    clean_user = username.strip().replace("https://github.com/", "").replace("/", "")
+    clean_user = normalize_github_username(username)
     url = f"{GITHUB_API}{clean_user}/repos?per_page=100&sort=pushed"
     try:
         response = requests.get(url, headers=get_headers(), timeout=10)
         if response.status_code != 200:
+            logger.warning(
+                "GitHub repositories for %s lookup returned %s (rate-limit remaining: %s)",
+                clean_user,
+                response.status_code,
+                response.headers.get("X-RateLimit-Remaining", "unknown"),
+            )
             return []
         return response.json()
     except Exception as e:

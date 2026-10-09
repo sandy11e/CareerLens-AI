@@ -12,6 +12,7 @@ export default function DevSignalsSection({ data }) {
   if (!data) return null;
 
   const github = data.github_signals;
+  const githubUnavailableMessage = data.github_error || 'No GitHub profile linked.';
   const leetcode = data.leetcode_signals;
   const devReadiness = data.developer_readiness || {};
   const repos = github?.top_repos || [];
@@ -67,7 +68,7 @@ export default function DevSignalsSection({ data }) {
             <LanguageDonutChart repos={repos} />
           ) : (
             <div style={{ textAlign: 'center', padding: '36px 20px', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
-              Link your GitHub username to visualize language distribution.
+              {data.github_error || 'Link your GitHub username to visualize language distribution.'}
             </div>
           )}
         </div>
@@ -224,7 +225,7 @@ export default function DevSignalsSection({ data }) {
             </div>
           ) : (
             <div style={{ textAlign: 'center', padding: '36px 20px', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
-              No GitHub profile linked.
+              {githubUnavailableMessage}
             </div>
           )}
         </div>
