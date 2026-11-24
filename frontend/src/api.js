@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://devlyzer-ai.onrender.com';
+const API_BASE_URL = import.meta.env.DEV ? '' : (import.meta.env.VITE_API_BASE_URL || '');
 
 const client = axios.create({
   baseURL: API_BASE_URL,
@@ -82,6 +82,25 @@ export const api = {
     return res.data;
   },
 
+  // Create a persistent asynchronous evaluation job after the resume upload succeeds.
+  async submitEvaluationJob({ sessionId, githubUsername, leetcodeUsername, targetRole }) {
+    const idempotencyKey = globalThis.crypto?.randomUUID?.() ||
+      `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const res = await client.post('/api/evaluations/jobs', {
+      session_id: sessionId,
+      github_username: githubUsername,
+      leetcode_username: leetcodeUsername,
+      target_role: targetRole || null,
+    }, {
+      headers: { 'Idempotency-Key': idempotencyKey },
+    });
+    return res.data;
+  },
+
+  async getEvaluationJobStatus(jobId) {
+    const res = await client.get(`/api/evaluations/jobs/${encodeURIComponent(jobId)}`);
+    return res.data;
+  },
   // Deep analyze uploaded resume
   async analyzeResume(sessionId) {
     const formData = new FormData();

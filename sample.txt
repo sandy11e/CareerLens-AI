@@ -1,0 +1,7 @@
+CareerLens-AI CI Pipeline Test
+
+This file is created to verify that
+GitHub Actions automatically triggers
+backend validation and frontend build
+when a new commit is pushed.
+new changes made

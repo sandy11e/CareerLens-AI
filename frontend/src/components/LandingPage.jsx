@@ -102,7 +102,7 @@ export default function LandingPage({
           margin: 0,
           textShadow: '0 2px 20px rgba(0,0,0,0.06)'
         }}>
-          Prove Technical Power.
+          Show Technical Power.
           <br />
           <span style={{
             color: 'var(--primary)',

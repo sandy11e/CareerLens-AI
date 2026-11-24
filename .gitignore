@@ -63,3 +63,14 @@ pnpm-debug.log*
 # AI Assistant & IDE metadata
 .gemini/
 .agents/
+.vercel
+.env*
+
+
+# Local migration backups and test artifacts
+*.backup
+results.txt
+
+# Local Python environments
+.venv/
+venv/

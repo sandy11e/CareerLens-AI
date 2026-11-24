@@ -1,0 +1,82 @@
+﻿name: Deploy CareerLens AI frontend to S3
+
+# Production deployments are manual and gated by the GitHub production environment.
+# The previous automatic production-branch push trigger is intentionally disabled.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: frontend-production-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Build and deploy frontend
+    if: ${{ github.ref == 'refs/heads/production' }}
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Validate deployment configuration
+        env:
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+          AWS_ROLE_TO_ASSUME: ${{ vars.AWS_ROLE_TO_ASSUME }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          test -n "$VITE_API_BASE_URL" || { echo "::error::Missing VITE_API_BASE_URL repository variable."; exit 1; }
+          test -n "$AWS_S3_BUCKET" || { echo "::error::Missing AWS_S3_BUCKET repository variable."; exit 1; }
+          test -n "$AWS_ROLE_TO_ASSUME" || { echo "::error::Missing AWS_ROLE_TO_ASSUME repository variable."; exit 1; }
+          test -n "$AWS_REGION" || { echo "::error::Missing AWS_REGION repository variable."; exit 1; }
+          test -n "$AWS_CLOUDFRONT_DISTRIBUTION_ID" || { echo "::error::Missing AWS_CLOUDFRONT_DISTRIBUTION_ID repository variable."; exit 1; }
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build production frontend
+        working-directory: frontend
+        env:
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+        run: npm run build
+
+      - name: Configure AWS credentials (GitHub OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
+
+      - name: Sync static site to S3
+        working-directory: frontend
+        env:
+          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+        run: aws s3 sync dist/ "s3://$AWS_S3_BUCKET/" --delete --no-progress
+
+      - name: Invalidate CloudFront cache
+        env:
+          AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          invalidation_id=$(aws cloudfront create-invalidation --distribution-id "$AWS_CLOUDFRONT_DISTRIBUTION_ID" --paths "/*" --query Invalidation.Id --output text)
+          aws cloudfront wait invalidation-completed --distribution-id "$AWS_CLOUDFRONT_DISTRIBUTION_ID" --id "$invalidation_id"
+
+      - name: Verify uploaded entry point
+        env:
+          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+        run: aws s3api head-object --bucket "$AWS_S3_BUCKET" --key index.html

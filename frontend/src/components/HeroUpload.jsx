@@ -11,34 +11,42 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
   const [validationError, setValidationError] = useState('');
   const fileInputRef = useRef(null);
 
-  const handleFileDrop = (e) => {
+  const validateResumeFile = async (candidate) => {
+    if (!candidate.name.toLowerCase().endsWith('.pdf')) return 'Please upload a PDF resume.';
+    if (candidate.type && candidate.type !== 'application/pdf') return 'The selected file must be a PDF document.';
+    if (candidate.size <= 0 || candidate.size > 6 * 1024 * 1024) return 'Resume PDFs must be between 1 byte and 6 MiB.';
+    const signature = await candidate.slice(0, 5).text();
+    if (signature !== '%PDF-') return 'The selected file does not have a valid PDF signature.';
+    return '';
+  };
+
+  const acceptResumeFile = async (candidate) => {
+    setValidationError('');
+    const problem = await validateResumeFile(candidate);
+    if (problem) {
+      setFile(null);
+      setValidationError(problem);
+      return;
+    }
+    setFile(candidate);
+  };
+
+  const handleFileDrop = async (e) => {
     e.preventDefault();
     setIsDragOver(false);
-    setValidationError('');
+    if (isLoading) return;
     const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile) {
-      if (!droppedFile.name.toLowerCase().endsWith('.pdf')) {
-        setValidationError('Please upload a PDF resume.');
-        return;
-      }
-      setFile(droppedFile);
-    }
+    if (droppedFile) await acceptResumeFile(droppedFile);
   };
 
-  const handleFileSelect = (e) => {
+  const handleFileSelect = async (e) => {
     const selected = e.target.files[0];
-    setValidationError('');
-    if (selected) {
-      if (!selected.name.toLowerCase().endsWith('.pdf')) {
-        setValidationError('Please upload a PDF resume.');
-        return;
-      }
-      setFile(selected);
-    }
+    if (selected) await acceptResumeFile(selected);
+    e.target.value = '';
   };
-
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (isLoading) return;
     if (!file) {
       setValidationError('Please upload your Resume PDF (Mandatory).');
       return;
@@ -149,6 +157,7 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
               type="file"
               accept=".pdf"
               onChange={handleFileSelect}
+              disabled={isLoading}
               style={{ display: 'none' }}
             />
 
@@ -214,7 +223,7 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
                     Drop your Resume PDF here, or <span style={{ color: 'var(--primary)', textDecoration: 'underline' }}>browse</span>
                   </div>
                   <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                    Standard PDF format up to 10MB • Text-layer & single/multi-column compatible
+                    PDF files up to 6 MiB • Text-layer & single/multi-column compatible
                   </div>
                 </div>
               </div>
@@ -357,7 +366,7 @@ export default function HeroUpload({ onAnalyze, isLoading }) {
               fontSize: '0.8rem'
             }}>
               <Shield size={14} color="var(--emerald)" />
-              <span>Private analysis • Your code and resume are never stored</span>
+              <span>Private analysis • Resume files are stored privately for your account</span>
             </div>
 
             <button

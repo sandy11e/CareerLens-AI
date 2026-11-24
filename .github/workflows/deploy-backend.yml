@@ -1,0 +1,93 @@
+﻿name: Deploy CareerLens AI backend to Lambda
+
+# Manual only. Configure required reviewers on the GitHub production environment.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: backend-production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Package and deploy API and worker Lambda ZIP
+    if: ${{ github.ref == 'refs/heads/production' }}
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Build and validate Lambda ZIP
+        run: python backend/scripts/build_lambda_zip.py --output "$RUNNER_TEMP/careerlens-lambda.zip"
+
+      - name: Validate deployment variables
+        env:
+          AWS_ROLE_TO_ASSUME: ${{ vars.AWS_ROLE_TO_ASSUME }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          LAMBDA_FUNCTION_NAME: ${{ vars.LAMBDA_FUNCTION_NAME }}
+          WORKER_LAMBDA_FUNCTION_NAME: ${{ vars.WORKER_LAMBDA_FUNCTION_NAME }}
+          LAMBDA_ARTIFACT_BUCKET: ${{ vars.LAMBDA_ARTIFACT_BUCKET }}
+        run: |
+          test -n "$AWS_ROLE_TO_ASSUME" || { echo "::error::Missing AWS_ROLE_TO_ASSUME repository variable."; exit 1; }
+          test -n "$AWS_REGION" || { echo "::error::Missing AWS_REGION repository variable."; exit 1; }
+          test -n "$LAMBDA_FUNCTION_NAME" || { echo "::error::Missing LAMBDA_FUNCTION_NAME repository variable."; exit 1; }
+          test -n "$WORKER_LAMBDA_FUNCTION_NAME" || { echo "::error::Missing WORKER_LAMBDA_FUNCTION_NAME repository variable."; exit 1; }
+          test -n "$LAMBDA_ARTIFACT_BUCKET" || { echo "::error::Missing LAMBDA_ARTIFACT_BUCKET repository variable."; exit 1; }
+
+      - name: Configure AWS credentials (GitHub OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
+
+      - name: Verify approved Lambda targets
+        env:
+          LAMBDA_FUNCTION_NAME: ${{ vars.LAMBDA_FUNCTION_NAME }}
+          WORKER_LAMBDA_FUNCTION_NAME: ${{ vars.WORKER_LAMBDA_FUNCTION_NAME }}
+        run: |
+          api_runtime=$(aws lambda get-function-configuration --function-name "$LAMBDA_FUNCTION_NAME" --query Runtime --output text)
+          api_handler=$(aws lambda get-function-configuration --function-name "$LAMBDA_FUNCTION_NAME" --query Handler --output text)
+          worker_runtime=$(aws lambda get-function-configuration --function-name "$WORKER_LAMBDA_FUNCTION_NAME" --query Runtime --output text)
+          worker_handler=$(aws lambda get-function-configuration --function-name "$WORKER_LAMBDA_FUNCTION_NAME" --query Handler --output text)
+          test "$api_runtime" = "python3.12" || { echo "::error::API Lambda runtime must be python3.12."; exit 1; }
+          test "$api_handler" = "main.handler" || { echo "::error::API Lambda handler must be main.handler."; exit 1; }
+          test "$worker_runtime" = "python3.12" || { echo "::error::Worker Lambda runtime must be python3.12."; exit 1; }
+          test "$worker_handler" = "worker.handler" || { echo "::error::Worker Lambda handler must be worker.handler."; exit 1; }
+
+      - name: Upload deployment ZIP to the configured artifact bucket
+        env:
+          LAMBDA_ARTIFACT_BUCKET: ${{ vars.LAMBDA_ARTIFACT_BUCKET }}
+        run: aws s3 cp "$RUNNER_TEMP/careerlens-lambda.zip" "s3://$LAMBDA_ARTIFACT_BUCKET/careerlens/lambda/${GITHUB_SHA}.zip" --no-progress
+
+      - name: Update approved API Lambda code
+        env:
+          LAMBDA_FUNCTION_NAME: ${{ vars.LAMBDA_FUNCTION_NAME }}
+          LAMBDA_ARTIFACT_BUCKET: ${{ vars.LAMBDA_ARTIFACT_BUCKET }}
+        run: |
+          aws lambda update-function-code --function-name "$LAMBDA_FUNCTION_NAME" --s3-bucket "$LAMBDA_ARTIFACT_BUCKET" --s3-key "careerlens/lambda/${GITHUB_SHA}.zip" --query LastUpdateStatus --output text
+          aws lambda wait function-updated --function-name "$LAMBDA_FUNCTION_NAME"
+          aws lambda get-function-configuration --function-name "$LAMBDA_FUNCTION_NAME" --query '{Runtime:Runtime,Handler:Handler,LastUpdateStatus:LastUpdateStatus}' --output json
+
+      - name: Update approved worker Lambda code
+        env:
+          WORKER_LAMBDA_FUNCTION_NAME: ${{ vars.WORKER_LAMBDA_FUNCTION_NAME }}
+          LAMBDA_ARTIFACT_BUCKET: ${{ vars.LAMBDA_ARTIFACT_BUCKET }}
+        run: |
+          aws lambda update-function-code --function-name "$WORKER_LAMBDA_FUNCTION_NAME" --s3-bucket "$LAMBDA_ARTIFACT_BUCKET" --s3-key "careerlens/lambda/${GITHUB_SHA}.zip" --query LastUpdateStatus --output text
+          aws lambda wait function-updated --function-name "$WORKER_LAMBDA_FUNCTION_NAME"
+          aws lambda get-function-configuration --function-name "$WORKER_LAMBDA_FUNCTION_NAME" --query '{Runtime:Runtime,Handler:Handler,LastUpdateStatus:LastUpdateStatus}' --output json

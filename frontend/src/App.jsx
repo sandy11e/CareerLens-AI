@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import Navbar from './components/Navbar';
 import LandingPage from './components/LandingPage';
@@ -25,6 +25,8 @@ export default function App() {
   const [analysisData, setAnalysisData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [evaluationStatus, setEvaluationStatus] = useState('uploading');
+  const analyzeLock = useRef(false);
   const [error, setError] = useState(null);
   const [lastParams, setLastParams] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
@@ -55,86 +57,82 @@ export default function App() {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
   };
 
-  // Initial health check, warm-up ping, and periodic heartbeat (every 8 minutes)
+  // Check backend health once and restore any saved session.
   useEffect(() => {
-    async function checkBackend() {
-      try {
-        const health = await api.checkHealth();
-        setGroqStatus(health);
-      } catch (err) {
-        console.warn('Backend warm-up ping failed:', err);
-      }
-    }
-    // Instant pre-warm ping on page load
-    checkBackend();
+    api.checkHealth().then(setGroqStatus).catch(() => setGroqStatus({ status: 'offline', groq_active: false }));
 
-    // Heartbeat ping every 8 minutes to prevent Render free-tier sleep while tab is open
-    const heartbeatInterval = setInterval(() => {
-      checkBackend();
-    }, 8 * 60 * 1000);
-
-    // Verify session if token stored
     async function verifyUser() {
       const token = localStorage.getItem('careerlens_token');
       if (token) {
         try {
           const res = await api.getMe();
-          if (res?.user) {
-            setCurrentUser(res.user);
-          }
+          if (res?.user) setCurrentUser(res.user);
         } catch {
-          // Token expired or invalid
           api.logout();
           setCurrentUser(null);
         }
       }
     }
     verifyUser();
-
-    return () => clearInterval(heartbeatInterval);
   }, []);
-
-  // Main evaluation trigger
+  // Upload once, enqueue the durable job, and poll its owner-scoped status.
   const handleAnalyze = async ({ file, githubUsername, leetcodeUsername }) => {
+    if (analyzeLock.current) return;
+    analyzeLock.current = true;
     setIsLoading(true);
     setError(null);
     setUploadProgress(0);
+    setEvaluationStatus('uploading');
     setLastParams({ file, githubUsername, leetcodeUsername });
     setCurrentView('app');
 
     try {
-      const result = await api.evaluateUnified({
-        file,
+      const resume = await api.uploadResume(file, (progress) => setUploadProgress(progress));
+      setUploadProgress(100);
+      setEvaluationStatus('pending');
+      const job = await api.submitEvaluationJob({
+        sessionId: resume.session_id,
         githubUsername,
         leetcodeUsername,
-        onUploadProgress: (progress) => setUploadProgress(progress)
       });
+      if (!job?.job_id) throw new Error('The evaluation service did not return a job ID.');
+
+      let result = null;
+      for (let attempt = 0; attempt < 300; attempt += 1) {
+        const status = await api.getEvaluationJobStatus(job.job_id);
+        setEvaluationStatus(status.status || 'pending');
+        if (status.status === 'failed') {
+          throw new Error(status.message || 'The evaluation could not be completed. Please retry.');
+        }
+        if (status.status === 'completed') {
+          const resultResponse = await api.getEvaluationDetail(job.job_id);
+          result = resultResponse?.analysis || resultResponse;
+          break;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
+      if (!result) throw new Error('Evaluation is taking longer than expected. You can check its status in evaluation history.');
 
       setAnalysisData(result);
       setActiveTab('overview');
-
-      // Trigger celebration confetti
+      setEvaluationStatus('completed');
       try {
-        confetti({
-          particleCount: 80,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
-      } catch (e) {
-        // ignore if confetti fails
+        confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+      } catch {
+        // A visual effect must not affect evaluation delivery.
       }
     } catch (err) {
-      console.error('Unified evaluation failed:', err);
+      console.error('Evaluation request failed.');
       const rawDetail = err.response?.data?.detail;
       const detail = rawDetail || (err.message === 'Network Error'
-        ? 'Network Error: The backend service may be waking up from sleep or temporarily unreachable. Please click Retry below.'
-        : err.message || 'Evaluation pipeline encountered an unexpected error.');
+        ? 'The backend service is temporarily unreachable. Please retry.'
+        : err.message || 'The evaluation could not be completed. Please retry.');
       setError(detail);
     } finally {
+      analyzeLock.current = false;
       setIsLoading(false);
     }
   };
-
   // Update roadmap when user changes target role dynamically in Roadmap tab
   const handleRoadmapUpdate = (newRoadmap, newRole) => {
     setAnalysisData((prev) => {
@@ -271,7 +269,7 @@ export default function App() {
           <>
             {/* Loading Pipeline State */}
             {isLoading && (
-              <LoadingProgress uploadProgress={uploadProgress} />
+              <LoadingProgress uploadProgress={uploadProgress} jobStatus={evaluationStatus} />
             )}
 
             {/* Error State */}
